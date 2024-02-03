@@ -3,7 +3,7 @@ env.config();
 import express, { Express } from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
-import studentRoute from "./routes/student_route";
+import CarRoute from "./routes/car";
 import studentPostRoute from "./routes/student_post_route";
 import authRoute from "./routes/auth_route";
 import fileRoute from "./routes/file_route";
@@ -24,7 +24,7 @@ const initApp = (): Promise<Express> => {
         res.header("Access-Control-Allow-Headers", "*");
         next();
       })
-      app.use("/student", studentRoute);
+      app.use("/car", CarRoute);
       app.use("/studentpost", studentPostRoute);
       app.use("/auth", authRoute);
       app.use("/file", fileRoute);

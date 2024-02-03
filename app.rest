@@ -1,25 +1,31 @@
 ###
 
-GET http://localhost:3000/student
+GET http://localhost:3000/car
 
 ###
 
-GET http://localhost:3000/student?name=John%20Doe
-
-
-###
-
-GET http://localhost:3000/student/1234567891
+GET http://localhost:3000/car?make=mercedes
 
 
 ###
 
-POST http://localhost:3000/student
+GET http://localhost:3000/car/1234567891
+
+
+###
+
+POST http://localhost:3000/car
 Content-Type: application/json
 
 {
-    "name": "John Doe 1",
-    "_id": "1234567891"
+    "_id": "1234567891",
+    "make": "toyota",
+    "model": "camry",
+    "year": 1993,
+    "price": 20000,
+    "hand": 3,
+    "color": "white",
+    "mileage": 200000,
 }
 
 ###
