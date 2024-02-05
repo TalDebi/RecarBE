@@ -23,7 +23,7 @@ const initApp = (): Promise<Express> => {
         res.header("Access-Control-Allow-Methods", "*");
         res.header("Access-Control-Allow-Headers", "*");
         next();
-      })
+      });
       app.use("/car", CarRoute);
       app.use("/studentpost", studentPostRoute);
       app.use("/auth", authRoute);
