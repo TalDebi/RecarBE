@@ -99,7 +99,7 @@ import authMiddleware from "../common/auth_middleware";
 
 /**
  * @swagger
- * /car/:
+ * /car:
  *  get:
  *      summary: get all cars
  *      tags: [Car]
@@ -143,7 +143,7 @@ router.get("/:id", authMiddleware, CarController.getById.bind(CarController));
 
 /**
  * @swagger
- * /car/:
+ * /car:
  *   post:
  *     summary: post a car
  *     tags: [Car]
@@ -168,8 +168,8 @@ router.post("/", authMiddleware, CarController.post.bind(CarController));
 /**
  * @swagger
  * /car/{carId}:
- *   post:
- *     summary: patch a car
+ *   put:
+ *     summary: put a car
  *     tags: [Car]
  *     description: need to provide the id of the specific car
  *     security:
@@ -180,7 +180,7 @@ router.post("/", authMiddleware, CarController.post.bind(CarController));
  *         schema:
  *           type: string
  *         required: true
- *         description: ID of the car to patch
+ *         description: ID of the car to put
  *     requestBody:
  *       required: true
  *       content:
@@ -189,7 +189,7 @@ router.post("/", authMiddleware, CarController.post.bind(CarController));
  *             $ref: '#/components/schemas/Car'
  *     responses:
  *       200:
- *         description: The car patched
+ *         description: The car puted
  *         content:
  *           application/json:
  *             schema:
@@ -200,7 +200,7 @@ router.put("/:id", authMiddleware, CarController.putById.bind(CarController));
 /**
  * @swagger
  * /car/{carId}:
- *   post:
+ *   delete:
  *     summary: delete a car
  *     tags: [Car]
  *     description: need to provide the id of the specific car
