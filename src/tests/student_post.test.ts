@@ -3,13 +3,15 @@ import request from "supertest";
 import initApp from "../app";
 import mongoose from "mongoose";
 import StudentPost, { IStudentPost } from "../models/student_post_model";
-import User, { IUser } from "../models/user_model";
+import UserModel, { User } from "../models/user";
 
 let app: Express;
-const user: IUser = {
+const user: User = {
+  name: "test user",
   email: "test@student.post.test",
+  username: "testUser",
   password: "1234567890",
-}
+};
 let accessToken = "";
 
 beforeAll(async () => {
@@ -17,7 +19,7 @@ beforeAll(async () => {
   console.log("beforeAll");
   await StudentPost.deleteMany();
 
-  await User.deleteMany({ 'email': user.email });
+  await UserModel.deleteMany({ email: user.email });
   const response = await request(app).post("/auth/register").send(user);
   user._id = response.body._id;
   const response2 = await request(app).post("/auth/login").send(user);
@@ -59,10 +61,10 @@ describe("Student post tests", () => {
   test("Test Get All Students posts with one post in DB", async () => {
     const response = await request(app).get("/studentpost");
     expect(response.statusCode).toBe(200);
+    console.log(response.body);
     const rc = response.body[0];
     expect(rc.title).toBe(post1.title);
     expect(rc.message).toBe(post1.message);
     expect(rc.owner).toBe(user._id);
   });
-
 });

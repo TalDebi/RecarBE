@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import studentRoute from "./routes/student_route";
 import studentPostRoute from "./routes/student_post_route";
-import authRoute from "./routes/auth_route";
+import authRoute from "./routes/auth";
 import fileRoute from "./routes/file_route";
 
 const initApp = (): Promise<Express> => {
@@ -23,7 +23,7 @@ const initApp = (): Promise<Express> => {
         res.header("Access-Control-Allow-Methods", "*");
         res.header("Access-Control-Allow-Headers", "*");
         next();
-      })
+      });
       app.use("/student", studentRoute);
       app.use("/studentpost", studentPostRoute);
       app.use("/auth", authRoute);
