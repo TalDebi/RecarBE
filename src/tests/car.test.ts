@@ -35,6 +35,8 @@ const car: Car = {
   hand: 2,
   color: "black",
   mileage: 100000,
+  city: "Holon",
+  owner: "1234567",
 };
 
 describe("Car tests", () => {
@@ -72,6 +74,8 @@ describe("Car tests", () => {
     expect(postedCar.hand).toBe(car.hand);
     expect(postedCar.color).toBe(car.color);
     expect(postedCar.mileage).toBe(car.mileage);
+    expect(postedCar.city).toBe(car.city);
+    expect(postedCar.owner).toBe(car.owner);
   });
 
   test("Test Post duplicate Car", async () => {
@@ -84,13 +88,18 @@ describe("Car tests", () => {
 
   test("Test PUT /car/:id", async () => {
     const updatedCar = { ...car, price: 35000 };
-    const response = await request(app).put(`/car/${car._id}`).send(updatedCar);
+    const response = await request(app)
+      .put(`/car/${car._id}`)
+      .set("Authorization", "JWT " + accessToken)
+      .send(updatedCar);
     expect(response.statusCode).toBe(201);
     expect(response.body.price).toBe(updatedCar.price);
   });
 
   test("Test DELETE /car/:id", async () => {
-    const response = await request(app).delete(`/car/${car._id}`);
+    const response = await request(app)
+      .delete(`/car/${car._id}`)
+      .set("Authorization", "JWT " + accessToken);
     expect(response.statusCode).toBe(201);
   });
 });

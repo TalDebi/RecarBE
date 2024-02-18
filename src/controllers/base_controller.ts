@@ -55,7 +55,7 @@ export class BaseController<ModelType> {
         req.params.id,
         req.body,
         {
-          returnNewDocument: true,
+          returnDocument: "after",
         }
       );
       res.status(201).send("the new object is: " + newObject);

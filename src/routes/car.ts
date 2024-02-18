@@ -34,6 +34,8 @@ import authMiddleware from "../common/auth_middleware";
  *         - hand
  *         - color
  *         - mileage
+ *         - city
+ *         - owner
  *       properties:
  *         _id:
  *           type: string
@@ -59,8 +61,16 @@ import authMiddleware from "../common/auth_middleware";
  *         mileage:
  *           type: number
  *           description: The car's mileage
+ *         city:
+ *           type: string
+ *           description: the car's selling point
+ *         owner:
+ *           type: string
+ *           description: the car's owner
+ *         imgsUrls:
+ *           type: string[]
+ *           description: images of the car
  *       example:
- *         _id: '1234567891'
  *         make: 'toyota'
  *         model: 'camry'
  *         year: 1993
@@ -68,6 +78,8 @@ import authMiddleware from "../common/auth_middleware";
  *         hand: 3
  *         color : 'white'
  *         mileage: 200000
+ *         city: 'holon'
+ *         owner: '1234567'
  */
 
 /**
@@ -79,22 +91,24 @@ import authMiddleware from "../common/auth_middleware";
  *       items:
  *         $ref: '#/components/schemas/Car'
  *       example:
- *         - _id: '1234567891'
- *           make: 'toyota'
+ *         - make: 'toyota'
  *           model: 'camry'
  *           year: 1993
  *           price: 20000
  *           hand: 3
  *           color : 'white'
  *           mileage: 200000
- *         - _id: '1234567892'
- *           make: 'toyota'
+ *           city: 'Holon'
+ *           owner: '1234567'
+ *         - make: 'toyota'
  *           model: 'camry'
  *           year: 2010
  *           price: 40000
  *           hand: 2
  *           color : 'black'
  *           mileage: 100000
+ *           city: 'Holon'
+ *           owner: '1234567'
  */
 
 /**
