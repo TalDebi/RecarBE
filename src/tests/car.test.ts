@@ -3,7 +3,7 @@ import initApp from "../app";
 import mongoose from "mongoose";
 import CarModel, { Car } from "../models/car";
 import { Express } from "express";
-import User from "../models/user_model";
+import User from "../models/user";
 
 let app: Express;
 let accessToken: string;

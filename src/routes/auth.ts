@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import authController from "../controllers/auth_controller";
+import authController from "../controllers/auth";
 /**
  * @swagger
  * tags:
@@ -25,18 +25,39 @@ import authController from "../controllers/auth_controller";
  *     User:
  *       type: object
  *       required:
+ *         - name
  *         - email
  *         - password
  *       properties:
+ *         name:
+ *           type: string
+ *           description: The user name
  *         email:
  *           type: string
  *           description: The user email
  *         password:
  *           type: string
  *           description: The user password
+ *         phoneNumber:
+ *           type: string
+ *           description: The user phone number
+ *         imgUrl:
+ *           type: string
+ *           description: The user imgUrl
+ *         refreshTokens:
+ *           type: string[]
+ *           description: The user refresh tokens
+ *         likedPosts:
+ *           type: string[]
+ *           description: The user liked posts ID`s
  *       example:
+ *         name: 'bob'
  *         email: 'bob@gmail.com'
  *         password: '123456'
+ *         phoneNumber: '054-2355489'
+ *         imgUrl: ''
+ *         refreshTokens: []
+ *         likedPosts: []
  */
 
 /**
@@ -81,6 +102,7 @@ import authController from "../controllers/auth_controller";
  *               $ref: '#/components/schemas/User'
  */
 router.post("/register", authController.register);
+
 router.post("/google", authController.googleSignin);
 
 /**
