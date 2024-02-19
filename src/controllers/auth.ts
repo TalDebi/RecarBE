@@ -21,7 +21,6 @@ const googleSignin = async (req: Request, res: Response) => {
         user = await UserModel.create({
           name: "",
           email: email,
-          username: "",
           password: "",
           imgUrl: payload?.picture,
         });
@@ -42,7 +41,6 @@ const googleSignin = async (req: Request, res: Response) => {
 const register = async (req: Request, res: Response) => {
   const name = req.body.name;
   const email = req.body.email;
-  const username = req.body.username;
   const password = req.body.password;
   const phoneNumber = req.body.phoneNumber;
   const imgUrl = req.body.imgUrl;
@@ -59,7 +57,6 @@ const register = async (req: Request, res: Response) => {
     const rs2 = await UserModel.create({
       name: name,
       email: email,
-      username: username,
       password: encryptedPassword,
       phoneNumber: phoneNumber,
       imgUrl: imgUrl,
@@ -68,7 +65,6 @@ const register = async (req: Request, res: Response) => {
     res.status(201).send({
       name: rs2.name,
       email: rs2.email,
-      username: rs2.username,
       phoneNumber: rs2.phoneNumber,
       _id: rs2._id,
       imgUrl: rs2.imgUrl,

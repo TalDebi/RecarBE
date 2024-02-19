@@ -4,7 +4,6 @@ export interface User {
   _id?: string;
   name: string;
   email: string;
-  username: string;
   password: string;
   phoneNumber?: string;
   imgUrl?: string;
@@ -18,10 +17,6 @@ const userSchema = new mongoose.Schema<User>({
     required: true,
   },
   email: {
-    type: String,
-    required: true,
-  },
-  username: {
     type: String,
     required: true,
   },

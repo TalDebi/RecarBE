@@ -9,7 +9,6 @@ let app: Express;
 const user: User = {
   name: "test user",
   email: "test@student.post.test",
-  username: "testUser",
   password: "1234567890",
 };
 let accessToken = "";

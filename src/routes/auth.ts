@@ -27,7 +27,6 @@ import authController from "../controllers/auth";
  *       required:
  *         - name
  *         - email
- *         - username
  *         - password
  *       properties:
  *         name:
@@ -36,9 +35,6 @@ import authController from "../controllers/auth";
  *         email:
  *           type: string
  *           description: The user email
- *         username:
- *           type: string
- *           description: The user username
  *         password:
  *           type: string
  *           description: The user password
@@ -57,7 +53,6 @@ import authController from "../controllers/auth";
  *       example:
  *         name: 'bob'
  *         email: 'bob@gmail.com'
- *         username: 'bob2'
  *         password: '123456'
  *         phoneNumber: '054-2355489'
  *         imgUrl: ''

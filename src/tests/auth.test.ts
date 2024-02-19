@@ -8,7 +8,6 @@ let app: Express;
 const user = {
   name: "test user",
   email: "testUser@test.com",
-  username: "testUser",
   password: "1234567890",
 };
 
