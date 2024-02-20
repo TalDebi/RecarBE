@@ -1,4 +1,4 @@
-import StudentPost, { IStudentPost } from "../models/student_post_model";
+import StudentPost, { IStudentPost } from "../models/post";
 import { BaseController } from "./base_controller";
 import { Response } from "express";
 import { AuthResquest } from "../common/auth_middleware";
