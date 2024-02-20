@@ -3,7 +3,7 @@ import { User } from "./user";
 
 export interface Comment {
     _id?: Schema.Types.ObjectId;
-    userId: Schema.Types.ObjectId | User;
+    user: Schema.Types.ObjectId | User;
     text: String;
     replies: Schema.Types.ObjectId[] | Comment[]
 }
@@ -13,7 +13,7 @@ const commentSchema = new Schema<Comment>({
         type: Schema.Types.ObjectId,
         required: true
     },
-    userId: {
+    user: {
         type: Schema.Types.ObjectId,
         required: true
     },
