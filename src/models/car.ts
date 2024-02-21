@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 export interface Car {
-  _id?: string;
+  _id?: mongoose.Schema.Types.ObjectId;
   make: string;
   model: string;
   year: number;
@@ -16,7 +16,8 @@ export interface Car {
 
 const carSchema = new mongoose.Schema<Car>({
   _id: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    default: new mongoose.Types.ObjectId()
   },
   make: {
     type: String,
