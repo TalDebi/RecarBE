@@ -4,9 +4,10 @@ import express, { Express } from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import CarRoute from "./routes/car";
-import studentPostRoute from "./routes/student_post_route";
+// import studentPostRoute from "./routes/student_post_route";
+import PostRouter from "./routes/post"
 import authRoute from "./routes/auth";
-import fileRoute from "./routes/file_route";
+import fileRoute, { route } from "./routes/file_route";
 
 const initApp = (): Promise<Express> => {
   const promise = new Promise<Express>((resolve) => {
@@ -25,9 +26,10 @@ const initApp = (): Promise<Express> => {
         next();
       });
       app.use("/car", CarRoute);
-      app.use("/studentpost", studentPostRoute);
+      // app.use("/studentpost", studentPostRoute);
       app.use("/auth", authRoute);
       app.use("/file", fileRoute);
+      app.use("/post", PostRouter)
       app.use("/public", express.static("public"));
       resolve(app);
     });

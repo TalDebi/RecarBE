@@ -29,4 +29,4 @@ const postSchema = new Schema<Post>({
   }
 });
 
-export default mongoose.model<Post>("StudentPost", postSchema);
+export default mongoose.model<Post>("Post", postSchema);

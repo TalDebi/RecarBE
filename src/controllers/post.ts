@@ -1,26 +1,30 @@
 import PostModel, { Post } from "../models/post"
 import createController, { BaseController } from "./base_controller"
-import { Request, Response } from "express";
+import { Response } from "express";
+import CommentModel from "../models/comment"
+import { AuthResquest } from "../common/auth_middleware"
 
 
 class PostController extends BaseController<Post>{
-    async get_complete(req: Request, res: Response) {
+    async getFull(req: AuthResquest, res: Response) {
         console.log("getAll");
         try {
-            if (req.query.name) {
+            if (req.params.id) {
                 const results = await this.model
-                    .find({ name: req.query.name })
-                    .populate("publisher")
-                    .populate({
-                        path: "comments",
-                        populate: [
-                            { path: 'user' },
-                            {
-                                path: 'replies',
-                                populate: { 'path': 'user' }
-                            }
-                        ]
-                    });
+                    .findById(req.params.id)
+                    .populate("publisher", ["name", "_id", "email", "imgUrl"])
+                    .populate("car")
+                    // .populate({
+                    //     path: "comments",
+                    //     populate: [
+                    //         { path: 'user' },
+                    //         {
+                    //             path: 'replies',
+                    //             populate: { 'path': 'user' }
+                    //         }
+                    //     ]
+                    // })
+                    .exec();
                 res.send(results);
             } else {
                 const results = await this.model.find();
@@ -31,13 +35,13 @@ class PostController extends BaseController<Post>{
         }
     }
 
-    async addComment(req: Request, res: Response) {
+    async addComment(req: AuthResquest, res: Response) {
         console.log("put:" + req.params.id);
 
         const oldObject: Post = await this.model.findById(req.params.id);
 
         if (!oldObject) return res.status(404).send("the ID is not exist...");
-        oldObject.comments.push(req.body)
+        oldObject.comments.push({ ...req.body, user: req.user._id })
 
         try {
             const newObject = await this.model.findByIdAndUpdate(
@@ -53,7 +57,15 @@ class PostController extends BaseController<Post>{
             res.status(500).send("fail: " + err.message);
         }
     }
+
+    async post(req: AuthResquest, res: Response) {
+        console.log("post:" + req.body);
+        const _id = req.user._id;
+        req.body.publisher = _id;
+        super.post(req, res);
+    }
 }
+
 
 const postController = new PostController(PostModel);
 
