@@ -1,8 +1,9 @@
 import PostModel, { Post } from "../models/post"
-import createController, { BaseController } from "./base_controller"
+import { BaseController } from "./base_controller"
 import { Response } from "express";
 import CommentModel, { Comment } from "../models/comment"
 import { AuthResquest } from "../common/auth_middleware"
+import { CommentRequest } from "../common/comment_middleware"
 
 
 class PostController extends BaseController<Post>{
@@ -14,16 +15,16 @@ class PostController extends BaseController<Post>{
                     .findById(req.params.id)
                     .populate("publisher", ["name", "_id", "email", "imgUrl"])
                     .populate("car")
-                    // .populate({
-                    //     path: "comments",
-                    //     populate: [
-                    //         { path: 'user' },
-                    //         {
-                    //             path: 'replies',
-                    //             populate: { 'path': 'user' }
-                    //         }
-                    //     ]
-                    // })
+                    .populate({
+                        path: "comments",
+                        populate: [
+                            { path: 'user' },
+                            {
+                                path: 'replies',
+                                populate: { 'path': 'user' }
+                            }
+                        ]
+                    })
                     .exec();
                 res.send(results);
             } else {
@@ -66,12 +67,35 @@ class PostController extends BaseController<Post>{
         super.post(req, res);
     }
 
-    async editComment(req: AuthResquest, res: Response) {
-        const oldComment: Comment = await CommentModel.findById(req.params.commentId);
-        const post: Post = await this.model.findById(req.params.postId);
-        if (!post.comments.includes(oldComment._id)) {
-            res.status(400).send("Comment does not belong to post")
+    async getComment(req: CommentRequest, res: Response) {
+        try {
+            res.send(req.comment);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
         }
+    }
+    async getPopulatedComment(req: AuthResquest, res: Response) {
+        try {
+            const post: Post = await this.model.findById(req.params.postId);
+            const comment: Comment = await CommentModel.findById(req.params.commentId)
+                .populate("publisher", ["name", "_id", "email", "imgUrl"])
+                .populate({
+                    path: "replies",
+                    populate: {
+                        path: 'user',
+                        select: ['"name", "_id", "email", "imgUrl"']
+                    }
+                });
+            if (!post.comments.includes(comment._id)) {
+                res.status(400).send("Comment does not belong to post")
+            }
+            res.send(comment);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    }
+
+    async editComment(req: CommentRequest, res: Response) {
         try {
             const newObject = await this.model.findByIdAndUpdate(
                 req.params.commentId,
@@ -85,6 +109,36 @@ class PostController extends BaseController<Post>{
             console.log(err);
             res.status(500).send("fail: " + err.message);
         };
+    }
+
+    async deleteById(req: AuthResquest, res: Response) {
+        const oldObject = await this.model.findById(req.params.id);
+
+        if (!oldObject) return res.status(404).send("the ID is not exist...");
+        for (let commentId of oldObject.comments) {
+            await CommentModel.findByIdAndDelete(commentId)
+        }
+        try {
+            const deletedObject = await this.model.findByIdAndDelete(req.params.id);
+            res.status(200).send(deletedObject);
+        } catch (err) {
+            console.log(err);
+            res.status(500).send("fail: " + err.message);
+        }
+    }
+
+
+    async deleteComment(req: CommentRequest, res: Response) {
+        try {
+            for (let replyId of req.comment.replies) {
+                await CommentModel.findByIdAndDelete(replyId)
+            }
+            const deletedObject = await CommentModel.findByIdAndDelete(req.comment._id);
+            res.status(200).send(deletedObject);
+        } catch (err) {
+            console.log(err);
+            res.status(500).send("fail: " + err.message);
+        }
     }
 }
 

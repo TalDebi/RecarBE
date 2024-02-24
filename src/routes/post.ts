@@ -1,6 +1,7 @@
 import express from "express";
 const router = express.Router();
 import authMiddleware from "../common/auth_middleware";
+import { commentMiddleware, securedCommentMiddleware } from "../common/comment_middleware";
 import postController from "../controllers/post";
 
 /**
@@ -85,7 +86,7 @@ import postController from "../controllers/post";
  * @swagger
  * components:
  *   schemas:
- *     populatedComment:
+ *     PopulatedComment:
  *       type: object
  *       required:
  *         - publisher
@@ -251,6 +252,70 @@ router.get("/:id/populated", authMiddleware, postController.getFull.bind(postCon
 
 /**
  * @swagger
+ * /post/{postId}/comment/{commentId}:
+ *  get:
+ *      summary: get a comment by id
+ *      tags: [Post]
+ *      description: Get a comment by Id
+ *      security:
+ *          - bearerAuth: []
+ *      parameters:
+ *       - in: path
+ *         name: postId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the post of the comment
+ *       - in: path
+ *         name: commentId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the of the comment
+ *      responses:
+ *        200:
+ *          description: The comment
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/Comment'
+ */
+router.get("/:postId/comment/:commentId", [authMiddleware, commentMiddleware], postController.getComment.bind(postController))
+
+/**
+ * @swagger
+ * /post/{postId}/comment/{commentId}/populated:
+ *  get:
+ *      summary: get a comment by id already populated
+ *      tags: [Post]
+ *      description: Get a comment by Id already populated
+ *      security:
+ *          - bearerAuth: []
+ *      parameters:
+ *       - in: path
+ *         name: postId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the post of the comment
+ *       - in: path
+ *         name: commentId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the of the comment
+ *      responses:
+ *        200:
+ *          description: The comment populated
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/PopulatedComment'
+ */
+router.get("/:postId/comment/:commentId/populated", authMiddleware, postController.getPopulatedComment.bind(postController))
+
+/**
+ * @swagger
  * /post:
  *   post:
  *     summary: post a post
@@ -341,7 +406,7 @@ router.post("/:postId/comment", postController.addComment.bind(postController));
  *             schema:
  *               $ref: '#/components/schemas/Comment'
  */
-router.put("/:postId/comment/:commentId", postController.editComment.bind(postController))
+router.put("/:postId/comment/:commentId", [authMiddleware, securedCommentMiddleware], postController.editComment.bind(postController))
 
 /**
  * @swagger
@@ -370,7 +435,7 @@ router.put("/:postId/comment/:commentId", postController.editComment.bind(postCo
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Car'
+ *               $ref: '#/components/schemas/Post'
  */
 router.put("/:id", authMiddleware, postController.putById.bind(postController));
 
@@ -393,6 +458,10 @@ router.put("/:id", authMiddleware, postController.putById.bind(postController));
  *     responses:
  *       200:
  *         description: The post deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Post'
  */
 router.delete(
     "/:id",
@@ -400,4 +469,35 @@ router.delete(
     postController.deleteById.bind(postController)
 );
 
+/**
+ * @swagger
+ * /post/{postId}/comment/{commentId}:
+ *   delete:
+ *     summary: delete a comment
+ *     tags: [Post]
+ *     description: need to provide the id of the specific post and comment
+ *     security:
+ *         - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the post of the comment
+ *       - in: path
+ *         name: commentId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the of the comment
+ *     responses:
+ *       200:
+ *         description: The comment deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Comment'
+ */
+router.delete("/:postId/comment/:commentId", [authMiddleware, securedCommentMiddleware], postController.deleteComment.bind(postController))
 export default router;
