@@ -60,7 +60,6 @@ import postController from "../controllers/post";
  *       required:
  *         - car
  *         - publisher
- *         - comment
  *       properties:
  *         _id:
  *           type: string
@@ -81,6 +80,51 @@ import postController from "../controllers/post";
  *         publisher: "56cb91bdc3464f14678934ca"
  *         comments: ["56cb91bdc3464f14678934ca", "56cb91bdc3464f14678934ca"]
  */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     populatedComment:
+ *       type: object
+ *       required:
+ *         - publisher
+ *         - text
+ *         - replies
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: objectId of the comment
+ *         text:
+ *           type: string
+ *           description: content of the comment
+ *         publisher:
+ *           $ref: '#/components/schemas/ReducedUser'
+ *         replies:
+ *           type: Array
+ *           description: Array of replies
+ *           items:
+ *             type: 
+ *               _id:
+ *                 type: string
+ *                 description: objectId of the comment
+ *               text:
+ *                 type: string
+ *                 description: content of the comment
+ *               publisher:
+ *                 $ref: '#/components/schemas/ReducedUser'
+ *       example:
+ *          text: "Nice car!"
+ *            publisher: 
+ *              name: 'Fred'
+ *              email: 'Fred@gmail.com'
+ *              imgUrl: ''
+ *            replies: 
+ *              - text: "Thanks!"
+ *                publisher: 
+ *                  name: 'bob'
+ *                  email: 'bob@gmail.com'
+ *                  imgUrl: ''
 
 /**
  * @swagger
@@ -207,10 +251,10 @@ router.get("/:id/populated", authMiddleware, postController.getFull.bind(postCon
 
 /**
  * @swagger
- * /car:
+ * /post:
  *   post:
- *     summary: post a car
- *     tags: [Car]
+ *     summary: post a post
+ *     tags: [Post]
  *     security:
  *         - bearerAuth: []
  *     requestBody:
@@ -218,32 +262,98 @@ router.get("/:id/populated", authMiddleware, postController.getFull.bind(postCon
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Car'
+ *             $ref: '#/components/schemas/Post'
  *     responses:
- *       200:
- *         description: The car posted
+ *       201:
+ *         description: The post posted
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Car'
+ *               $ref: '#/components/schemas/Post'
  */
 router.post("/", authMiddleware, postController.post.bind(postController));
 
+
+/**
+ * @swagger
+ * /post/{postId}/comment:
+ *   post:
+ *     summary: post a comment on post
+ *     tags: [Post]
+ *     security:
+ *         - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Comment'
+ *     parameters:
+ *        - in: path
+ *          name: postId
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: ID of the post to post a comment on
+ *     responses:
+ *       201:
+ *         description: The comment posted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Comment'
+ */
 router.post("/:postId/comment", postController.addComment.bind(postController));
+
+/**
+ * @swagger
+ * /post/{postId}/comment/{commentId}:
+ *   put:
+ *     summary: Edit a comment
+ *     tags: [Post]
+ *     security:
+ *         - bearerAuth: []
+ *     parameters:
+ *        - in: path
+ *          name: postId
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: ID of the post that the comment belongo to
+ *        - in: path
+ *          name: commentId
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: ID of the comment to be edited
+ *  
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Comment'
+ *     responses:
+ *       200:
+ *         description: The comment posted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Comment'
+ */
 router.put("/:postId/comment/:commentId", postController.editComment.bind(postController))
 
 /**
  * @swagger
- * /car/{carId}:
+ * /post/{id}:
  *   put:
- *     summary: put a car
- *     tags: [Car]
- *     description: need to provide the id of the specific car
+ *     summary: Edit a post
+ *     tags: [Post]
  *     security:
  *         - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: carId
+ *         name: id
  *         schema:
  *           type: string
  *         required: true
@@ -266,33 +376,23 @@ router.put("/:id", authMiddleware, postController.putById.bind(postController));
 
 /**
  * @swagger
- * /car/{carId}:
+ * /post/{id}:
  *   delete:
- *     summary: delete a car
- *     tags: [Car]
- *     description: need to provide the id of the specific car
+ *     summary: delete a post
+ *     tags: [Post]
+ *     description: need to provide the id of the specific post
  *     security:
  *         - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: carId
+ *         name: id
  *         schema:
  *           type: string
  *         required: true
- *         description: ID of the car to delete
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Car'
+ *         description: ID of the post to delete
  *     responses:
  *       200:
- *         description: The car deleted
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Car'
+ *         description: The post deleted
  */
 router.delete(
     "/:id",
