@@ -3,9 +3,9 @@ import { User } from "./user";
 
 export interface Comment {
     _id?: Schema.Types.ObjectId;
-    user: Schema.Types.ObjectId | User;
+    publisher: Schema.Types.ObjectId;
     text: String;
-    replies: Schema.Types.ObjectId[] | Comment[]
+    replies: Schema.Types.ObjectId[]
 }
 
 const commentSchema = new Schema<Comment>({
@@ -13,7 +13,7 @@ const commentSchema = new Schema<Comment>({
         type: Schema.Types.ObjectId,
         required: true
     },
-    user: {
+    publisher: {
         type: Schema.Types.ObjectId,
         required: true
     },

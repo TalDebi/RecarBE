@@ -7,7 +7,7 @@ export interface Post {
   _id?: Schema.Types.ObjectId
   car: Car;
   publisher: User;
-  comments: Schema.Types.ObjectId[] | Comment[];
+  comments: Schema.Types.ObjectId[];
 }
 
 const postSchema = new Schema<Post>({

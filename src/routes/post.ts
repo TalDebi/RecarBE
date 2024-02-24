@@ -6,8 +6,8 @@ import postController from "../controllers/post";
 /**
  * @swagger
  * tags:
- *   name: Car
- *   description: Car API
+ *   name: Post
+ *   description: Post API
  */
 
 /**
@@ -24,138 +24,186 @@ import postController from "../controllers/post";
  * @swagger
  * components:
  *   schemas:
- *     Car:
+ *     Comment:
  *       type: object
  *       required:
- *         - make
- *         - model
- *         - year
- *         - price
- *         - hand
- *         - color
- *         - mileage
- *         - city
- *         - owner
+ *         - publisher
+ *         - text
+ *         - replies
  *       properties:
  *         _id:
  *           type: string
- *           description: id
- *         make:
+ *           description: objectId of the comment
+ *         text:
  *           type: string
- *           description: The car's make
- *         model:
+ *           description: content of the comment
+ *         publisher:
  *           type: string
- *           description: The car's model
- *         year:
- *           type: number
- *           description: The car's year of making
- *         price:
- *           type: number
- *           description: The car's price
- *         hand:
- *           type: number
- *           description: The car's hand
- *         color:
- *           type: string
- *           description: The car's color
- *         mileage:
- *           type: number
- *           description: The car's mileage
- *         city:
- *           type: string
- *           description: the car's selling point
- *         owner:
- *           type: string
- *           description: the car's owner
- *         imgsUrls:
- *           type: string[]
- *           description: images of the car
+ *           description: objectId of the user who published the post
+ *         replies:
+ *           type: Array
+ *           description: Array of objectIds of replies
+ *           items:
+ *             type: string
  *       example:
- *         make: 'toyota'
- *         model: 'camry'
- *         year: 1993
- *         price: 20000
- *         hand: 3
- *         color : 'white'
- *         mileage: 200000
- *         city: 'holon'
- *         owner: '1234567'
+ *         text: "Nice car!"
+ *         publisher: "56cb91bdc3464f14678934ca"
+ *         replies: ["56cb91bdc3464f14678934ca", "56cb91bdc3464f14678934ca"]
  */
 
 /**
  * @swagger
  * components:
  *   schemas:
- *     ArrayOfCars:
- *       type: array
- *       items:
- *         $ref: '#/components/schemas/Car'
+ *     Post:
+ *       type: object
+ *       required:
+ *         - car
+ *         - publisher
+ *         - comment
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: objectId of the post
+ *         car:
+ *           type: string
+ *           description: objectId of car to be published in the post
+ *         publisher:
+ *           type: string
+ *           description: objectId of the user who published the post
+ *         comments:
+ *           type: Array
+ *           description: Array of objectIds of comments
+ *           items:
+ *             type: string
  *       example:
- *         - make: 'toyota'
+ *         car: "56cb91bdc3464f14678934ca"
+ *         publisher: "56cb91bdc3464f14678934ca"
+ *         comments: ["56cb91bdc3464f14678934ca", "56cb91bdc3464f14678934ca"]
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     PopulatedPost:
+ *       type: object
+ *       required:
+ *         - car
+ *         - publisher
+ *         - comment
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: objectId of the post
+ *         car:
+ *           $ref: '#/components/schemas/Car'
+ *         publisher:
+ *           $ref: '#/components/schemas/ReducedUser'
+ *         comments:
+ *           type: Array
+ *           description: Array of objectIds of comments
+ *           items:
+ *             $ref: '#/components/schemas/Comment'
+ *       example:
+ *         car: 
+ *           make: 'toyota'
  *           model: 'camry'
  *           year: 1993
  *           price: 20000
  *           hand: 3
  *           color : 'white'
  *           mileage: 200000
- *           city: 'Holon'
+ *           city: 'holon'
  *           owner: '1234567'
- *         - make: 'toyota'
- *           model: 'camry'
- *           year: 2010
- *           price: 40000
- *           hand: 2
- *           color : 'black'
- *           mileage: 100000
- *           city: 'Holon'
- *           owner: '1234567'
+ *         publisher:
+ *           name: 'bob'
+ *           email: 'bob@gmail.com'
+ *           imgUrl: ''
+ *         comments:
+ *           - text: "Nice car!"
+ *             publisher: 
+ *               name: 'Fred'
+ *               email: 'Fred@gmail.com'
+ *               imgUrl: ''
+ *             replies: 
+ *               - text: "Thanks!"
+ *                 publisher: 
+ *                   name: 'bob'
+ *                   email: 'bob@gmail.com'
+ *                   imgUrl: ''
  */
 
 /**
  * @swagger
- * /car:
+ * /post:
  *  get:
- *      summary: get all cars
- *      tags: [Car]
+ *      summary: get all posts
+ *      tags: [Post]
  *      security:
  *          - bearerAuth: []
  *      responses:
  *          200:
- *              description: all cars
+ *              description: all Posts
  *              content:
  *                  application/json:
  *                      schema:
- *                          $ref: '#/components/schemas/ArrayOfCars'
+ *                          type: array
+ *                          items:
+ *                              $ref: '#/components/schemas/Post'
  */
 router.get("/", authMiddleware, postController.get.bind(postController));
 
 /**
  * @swagger
- * /car/{carId}:
+ * /post/{postId}:
  *  get:
- *      summary: get a car by id
- *      tags: [Car]
- *      description: need to provide the id of the specific car
+ *      summary: get a post by id
+ *      tags: [Post]
+ *      description: Get a post by Id
  *      security:
  *          - bearerAuth: []
  *      parameters:
  *        - in: path
- *          name: carId
+ *          name: postId
  *          schema:
  *            type: string
  *          required: true
- *          description: ID of the car to get
+ *          description: ID of the post to get
  *      responses:
  *          200:
- *              description: a car
+ *              description: a post
  *              content:
  *                  application/json:
  *                      schema:
- *                          $ref: '#/components/schemas/Car'
+ *                          $ref: '#/components/schemas/Post'
  */
 router.get("/:id", authMiddleware, postController.getById.bind(postController));
-
-router.get("/:id/full", authMiddleware, postController.getFull.bind(postController));
+/**
+ * @swagger
+ * /post/{postId}/populated:
+ *  get:
+ *      summary: get a post by id with references already populated
+ *      tags: [Post]
+ *      description: get a post by id with references already populated
+ *      security:
+ *          - bearerAuth: []
+ *      parameters:
+ *        - in: path
+ *          name: postId
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: ID of the post to get
+ *      responses:
+ *          200:
+ *              description: a post
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/PopulatedPost'
+ */
+router.get("/:id/populated", authMiddleware, postController.getFull.bind(postController));
 
 /**
  * @swagger
@@ -181,7 +229,8 @@ router.get("/:id/full", authMiddleware, postController.getFull.bind(postControll
  */
 router.post("/", authMiddleware, postController.post.bind(postController));
 
-router.post("/:id/addComment", postController.addComment.bind(postController));
+router.post("/:postId/comment", postController.addComment.bind(postController));
+router.put("/:postId/comment/:commentId", postController.editComment.bind(postController))
 
 /**
  * @swagger

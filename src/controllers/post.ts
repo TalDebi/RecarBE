@@ -1,7 +1,7 @@
 import PostModel, { Post } from "../models/post"
 import createController, { BaseController } from "./base_controller"
 import { Response } from "express";
-import CommentModel from "../models/comment"
+import CommentModel, { Comment } from "../models/comment"
 import { AuthResquest } from "../common/auth_middleware"
 
 
@@ -38,14 +38,15 @@ class PostController extends BaseController<Post>{
     async addComment(req: AuthResquest, res: Response) {
         console.log("put:" + req.params.id);
 
-        const oldObject: Post = await this.model.findById(req.params.id);
-
+        const oldObject: Post = await this.model.findById(req.params.postId);
+        const newComment = await CommentModel.create(req.body)
         if (!oldObject) return res.status(404).send("the ID is not exist...");
-        oldObject.comments.push({ ...req.body, user: req.user._id })
+
+        oldObject.comments.push(newComment._id)
 
         try {
             const newObject = await this.model.findByIdAndUpdate(
-                req.params.id,
+                req.params.postId,
                 oldObject,
                 {
                     returnDocument: "after",
@@ -63,6 +64,27 @@ class PostController extends BaseController<Post>{
         const _id = req.user._id;
         req.body.publisher = _id;
         super.post(req, res);
+    }
+
+    async editComment(req: AuthResquest, res: Response) {
+        const oldComment: Comment = await CommentModel.findById(req.params.commentId);
+        const post: Post = await this.model.findById(req.params.postId);
+        if (!post.comments.includes(oldComment._id)) {
+            res.status(400).send("Comment does not belong to post")
+        }
+        try {
+            const newObject = await this.model.findByIdAndUpdate(
+                req.params.commentId,
+                req.body,
+                {
+                    returnDocument: "after",
+                }
+            );
+            res.status(200).send(newObject);
+        } catch (err) {
+            console.log(err);
+            res.status(500).send("fail: " + err.message);
+        };
     }
 }
 
