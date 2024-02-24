@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 export interface Car {
-  _id?: mongoose.Schema.Types.ObjectId;
+  _id?: mongoose.Schema.Types.ObjectId | string;
   make: string;
   model: string;
   year: number;

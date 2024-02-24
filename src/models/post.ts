@@ -1,5 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-import { Comment } from "./comment";
 import { Car } from "./car";
 import { User } from "./user";
 

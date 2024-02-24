@@ -58,7 +58,7 @@ export class BaseController<ModelType> {
           returnDocument: "after",
         }
       );
-      res.status(201).send(newObject);
+      res.status(200).send(newObject);
     } catch (err) {
       console.log(err);
       res.status(500).send("fail: " + err.message);
@@ -75,7 +75,7 @@ export class BaseController<ModelType> {
     try {
       const deletedObject = await this.model.findByIdAndDelete(req.params.id);
 
-      res.status(201).send(deletedObject);
+      res.status(200).send(deletedObject);
     } catch (err) {
       console.log(err);
       res.status(500).send("fail: " + err.message);

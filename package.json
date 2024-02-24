@@ -6,7 +6,7 @@
   "scripts": {
     "test": "tsc && jest --detectOpenHandles --forceExit",
     "testAuth": "tsc && jest --detectOpenHandles --forceExit ./src/tests/auth.test.ts",
-    "testPost": "tsc && jest --detectOpenHandles --forceExit --runInBand ./src/tests/student_post.test.ts",
+    "testCar": "tsc && jest --detectOpenHandles --forceExit --runInBand ./src/tests/car.test.ts",
     "testFile": "tsc && jest --detectOpenHandles --forceExit --runInBand ./src/tests/file.test.ts",
     "start": "tsc && node ./dist/src/server.js",
     "dev": "nodemon ./src/server.ts",
