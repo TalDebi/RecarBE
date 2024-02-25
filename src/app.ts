@@ -15,7 +15,7 @@ const initApp = (): Promise<Express> => {
     db.once("open", () => console.log("Connected to Database"));
     db.on("error", (error) => console.error(error));
     const url = process.env.DB_URL;
-    mongoose.connect(url!).then(() => {
+    mongoose.connect(url).then(() => {
       const app = express();
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: true }));
@@ -26,7 +26,6 @@ const initApp = (): Promise<Express> => {
         next();
       });
       app.use("/car", CarRoute);
-      // app.use("/studentpost", studentPostRoute);
       app.use("/auth", authRoute);
       app.use("/file", fileRoute);
       app.use("/post", PostRouter)

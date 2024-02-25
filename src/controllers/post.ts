@@ -4,6 +4,7 @@ import { Response } from "express";
 import CommentModel, { Comment } from "../models/comment"
 import { AuthResquest } from "../common/auth_middleware"
 import { CommentRequest } from "../common/comment_middleware"
+import { ObjectId } from "mongoose";
 
 
 class PostController extends BaseController<Post>{
@@ -86,7 +87,7 @@ class PostController extends BaseController<Post>{
                         select: ['"name", "_id", "email", "imgUrl"']
                     }
                 });
-            if (!post.comments.includes(comment._id)) {
+            if (!post.comments.includes(comment._id as (string & ObjectId))) {
                 res.status(400).send("Comment does not belong to post")
             }
             res.send(comment);

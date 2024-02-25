@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthResquest } from "./auth_middleware"
 import PostModel, { Post } from '../models/post';
 import CommentModel, { Comment } from "../models/comment"
+import { ObjectId } from 'mongoose';
 
 export interface CommentRequest extends AuthResquest {
   comment?: Comment,
@@ -12,7 +13,7 @@ export const commentMiddleware = async (req: CommentRequest, res: Response, next
   try {
     const comment: Comment = await CommentModel.findById(req.params.commentId);
     const post: Post = await PostModel.findById(req.params.postId);
-    if (!post.comments.includes(comment._id)) {
+    if (!post.comments.includes(comment._id )) {
       res.status(400).send("Comment does not belong to post")
     }
     req.comment = comment

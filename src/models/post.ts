@@ -3,10 +3,10 @@ import { Car } from "./car";
 import { User } from "./user";
 
 export interface Post {
-  _id?: Schema.Types.ObjectId
-  car: Car;
-  publisher: User;
-  comments: Schema.Types.ObjectId[];
+  _id?: Schema.Types.ObjectId | string
+  car: Car | string;
+  publisher: User | string;
+  comments?: (Schema.Types.ObjectId | string)[];
 }
 
 const postSchema = new Schema<Post>({

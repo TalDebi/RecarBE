@@ -3,7 +3,6 @@ import initApp from "../app";
 import mongoose from "mongoose";
 import CarModel, { Car } from "../models/car";
 import { Express } from "express";
-import { Schema, ObjectId } from "mongoose";
 import User from "../models/user";
 
 let app: Express;
@@ -19,7 +18,7 @@ beforeAll(async () => {
   await CarModel.deleteMany();
 
   User.deleteMany({ email: user.email });
-  let response1 = await request(app).post("/auth/register").send(user);
+  await request(app).post("/auth/register").send(user);
   const response = await request(app).post("/auth/login").send(user);
   accessToken = response.body.accessToken;
 });
