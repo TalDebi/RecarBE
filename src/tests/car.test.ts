@@ -18,7 +18,7 @@ beforeAll(async () => {
   await CarModel.deleteMany();
 
   User.deleteMany({ email: user.email });
-  await request(app).post("/auth/register").send(user);
+  const response2 = await request(app).post("/auth/register").send(user);
   const response = await request(app).post("/auth/login").send(user);
   accessToken = response.body.accessToken;
 });
@@ -84,7 +84,7 @@ describe("Car tests", () => {
       .post("/car")
       .set("Authorization", "JWT " + accessToken)
       .send(car);
-    expect(response.statusCode).toBe(406);
+    expect(response.statusCode).toBe(409);
   });
 
   test("Test PUT /car/:id", async () => {
