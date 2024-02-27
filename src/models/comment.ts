@@ -9,10 +9,6 @@ export interface Comment {
 }
 
 const commentSchema = new Schema<Comment>({
-    _id: {
-        type: Schema.Types.ObjectId,
-        required: true
-    },
     publisher: {
         type: Schema.Types.ObjectId,
         required: true

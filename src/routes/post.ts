@@ -51,6 +51,29 @@ import postController from "../controllers/post";
  *         publisher: "56cb91bdc3464f14678934ca"
  *         replies: ["56cb91bdc3464f14678934ca", "56cb91bdc3464f14678934ca"]
  */
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Reply:
+ *       type: object
+ *       required:
+ *         - publisher
+ *         - text
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: objectId of the comment
+ *         text:
+ *           type: string
+ *           description: content of the comment
+ *         publisher:
+ *           type: string
+ *           description: objectId of the user who published the post
+ *       example:
+ *         text: "Nice car!"
+ *         publisher: "56cb91bdc3464f14678934ca"
+ */
 
 /**
  * @swagger
@@ -248,7 +271,7 @@ router.get("/:id", authMiddleware, postController.getById.bind(postController));
  *                      schema:
  *                          $ref: '#/components/schemas/PopulatedPost'
  */
-router.get("/:id/populated", authMiddleware, postController.getFull.bind(postController));
+router.get("/:id/populated", authMiddleware, postController.getPopulatedPost.bind(postController));
 
 /**
  * @swagger
@@ -369,6 +392,43 @@ router.post("/", authMiddleware, postController.post.bind(postController));
  *               $ref: '#/components/schemas/Comment'
  */
 router.post("/:postId/comment", postController.addComment.bind(postController));
+
+/**
+ * @swagger
+ * /post/{postId}/comment/{commentId}/reply:
+ *   post:
+ *     summary: post a reply to a comment
+ *     tags: [Post]
+ *     security:
+ *         - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Reply'
+ *     parameters:
+ *        - in: path
+ *          name: postId
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: ID of the post 
+ *        - in: path
+ *          name: commentId
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: ID of the comment
+ *     responses:
+ *       201:
+ *         description: The comment posted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Reply'
+ */
+router.post("/:postId/comment/:commentId/reply", [authMiddleware, commentMiddleware], postController.addReply.bind(postController));
 
 /**
  * @swagger

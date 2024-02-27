@@ -8,8 +8,8 @@ import { ObjectId } from "mongoose";
 
 
 class PostController extends BaseController<Post>{
-    async getFull(req: AuthResquest, res: Response) {
-        console.log("getAll");
+    async getPopulatedPost(req: AuthResquest, res: Response) {
+        console.log("get populated post");
         try {
             if (req.params.id) {
                 const results = await this.model
@@ -19,26 +19,32 @@ class PostController extends BaseController<Post>{
                     .populate({
                         path: "comments",
                         populate: [
-                            { path: 'user' },
+                            {
+                                path: "publisher",
+                                select: ["name", "_id", "email", "imgUrl"]
+                            },
                             {
                                 path: 'replies',
-                                populate: { 'path': 'user' }
+                                populate: {
+                                    path: 'publisher',
+                                    select: ["name", "_id", "email", "imgUrl"]
+                                }
                             }
                         ]
-                    })
-                    .exec();
+                    });
                 res.send(results);
             } else {
                 const results = await this.model.find();
                 res.send(results);
             }
         } catch (err) {
+            console.log(err)
             res.status(500).json({ message: err.message });
         }
     }
 
     async addComment(req: AuthResquest, res: Response) {
-        console.log("put:" + req.params.id);
+        console.log("add comment to post: " + req.params.postId);
 
         const oldObject: Post = await this.model.findById(req.params.postId);
         const newComment = await CommentModel.create(req.body)
@@ -69,9 +75,11 @@ class PostController extends BaseController<Post>{
     }
 
     async getComment(req: CommentRequest, res: Response) {
+        console.log("get commnet: " + req.comment._id + " of post " + req.post._id)
         try {
             res.send(req.comment);
         } catch (err) {
+            console.log(err);
             res.status(500).json({ message: err.message });
         }
     }
@@ -83,9 +91,9 @@ class PostController extends BaseController<Post>{
                 .populate({
                     path: "replies",
                     populate: {
-                        path: 'user',
-                        select: ['"name", "_id", "email", "imgUrl"']
-                    }
+                        path: 'publisher',
+                        select: ["name", "_id", "email", "imgUrl"]
+                    },
                 });
             if (!post.comments.includes(comment._id as (string & ObjectId))) {
                 res.status(400).send("Comment does not belong to post")
@@ -134,8 +142,27 @@ class PostController extends BaseController<Post>{
             for (let replyId of req.comment.replies) {
                 await CommentModel.findByIdAndDelete(replyId)
             }
+
+            await PostModel.updateOne(
+                { _id: req.post._id },
+                { $pull: { comments: req.comment._id } }
+            )
             const deletedObject = await CommentModel.findByIdAndDelete(req.comment._id);
             res.status(200).send(deletedObject);
+        } catch (err) {
+            console.log(err);
+            res.status(500).send("fail: " + err.message);
+        }
+    }
+
+    async addReply(req: CommentRequest, res: Response) {
+        try {
+            const reply: Comment = await CommentModel.create(req.body)
+            await CommentModel.updateOne(
+                { _id: req.comment._id },
+                { $push: { replies: reply._id } }
+            )
+            res.status(200).send("success");
         } catch (err) {
             console.log(err);
             res.status(500).send("fail: " + err.message);

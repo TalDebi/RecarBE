@@ -6,6 +6,9 @@ import { Express } from "express";
 import User from "../models/user";
 import PostModel, { Post } from "../models/post";
 
+let objects_to_delete = []
+
+
 let app: Express;
 let accessToken: string;
 let user = {
@@ -34,6 +37,7 @@ beforeAll(async () => {
   const response1 = await request(app).post("/auth/register").send(user);
   await (await request(app).post("/car").send(car)).body._id
   user['_id'] = response1.body._id
+  objects_to_delete.push({ "model": User, "id": user['_id'] })
   const response = await request(app).post("/auth/login").send(user);
   accessToken = response.body.accessToken;
 });
@@ -50,7 +54,7 @@ const post: Post = {
 };
 
 describe("Post tests", () => {
-  
+
   // test("Test Get All Cars - empty response", async () => {
   //   const response = await request(app)
   //     .get("/car")
@@ -65,9 +69,10 @@ describe("Post tests", () => {
       .set("Authorization", "JWT " + accessToken)
       .send(post);
     expect(response.statusCode).toBe(201);
+    objects_to_delete.push({ "model": PostModel, "id": post._id })
   });
 
-  test("Test Get All Cars with one car in DB", async () => {
+  test("Test Get All posts with one post in DB", async () => {
     const response = await request(app)
       .get("/post")
       .set("Authorization", "JWT " + accessToken);
@@ -88,7 +93,7 @@ describe("Post tests", () => {
     expect(response.statusCode).toBe(409);
   });
 
-  test("Test PUT /car/:id", async () => {
+  test("Test PUT /post/:id", async () => {
     const updatedCar = { ...car, price: 35000 };
     const response = await request(app)
       .put(`/car/${car._id}`)
