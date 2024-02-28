@@ -11,7 +11,8 @@ export interface Comment {
 const commentSchema = new Schema<Comment>({
     publisher: {
         type: Schema.Types.ObjectId,
-        required: true
+        required: true,
+        ref: 'User'
     },
     text: {
         type: String,

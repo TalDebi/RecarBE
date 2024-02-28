@@ -149,6 +149,8 @@ import postController from "../controllers/post";
  *                  name: 'bob'
  *                  email: 'bob@gmail.com'
  *                  imgUrl: ''
+ */
+
 
 /**
  * @swagger
@@ -335,7 +337,7 @@ router.get("/:postId/comment/:commentId", [authMiddleware, commentMiddleware], p
  *              schema:
  *                $ref: '#/components/schemas/PopulatedComment'
  */
-router.get("/:postId/comment/:commentId/populated", authMiddleware, postController.getPopulatedComment.bind(postController))
+router.get("/:postId/comment/:commentId/populated", [authMiddleware, commentMiddleware], postController.getPopulatedComment.bind(postController))
 
 /**
  * @swagger

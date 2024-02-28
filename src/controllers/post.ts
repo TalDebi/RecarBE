@@ -83,11 +83,12 @@ class PostController extends BaseController<Post>{
             res.status(500).json({ message: err.message });
         }
     }
-    async getPopulatedComment(req: AuthResquest, res: Response) {
+    async getPopulatedComment(req: CommentRequest, res: Response) {
         try {
-            const post: Post = await this.model.findById(req.params.postId);
-            const comment: Comment = await CommentModel.findById(req.params.commentId)
-                .populate("publisher", ["name", "_id", "email", "imgUrl"])
+            const comment: Comment = await CommentModel.findById(req.comment._id)
+                .populate(
+                    "publisher",
+                    ["name", "_id", "email", "imgUrl"])
                 .populate({
                     path: "replies",
                     populate: {
@@ -95,9 +96,7 @@ class PostController extends BaseController<Post>{
                         select: ["name", "_id", "email", "imgUrl"]
                     },
                 });
-            if (!post.comments.includes(comment._id as (string & ObjectId))) {
-                res.status(400).send("Comment does not belong to post")
-            }
+            
             res.send(comment);
         } catch (err) {
             res.status(500).json({ message: err.message });
