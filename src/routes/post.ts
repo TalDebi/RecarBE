@@ -139,16 +139,16 @@ import postController from "../controllers/post";
  *                 $ref: '#/components/schemas/ReducedUser'
  *       example:
  *          text: "Nice car!"
- *            publisher: 
- *              name: 'Fred'
- *              email: 'Fred@gmail.com'
- *              imgUrl: ''
- *            replies: 
- *              - text: "Thanks!"
- *                publisher: 
- *                  name: 'bob'
- *                  email: 'bob@gmail.com'
- *                  imgUrl: ''
+ *          publisher: 
+ *            name: 'Fred'
+ *            email: 'Fred@gmail.com'
+ *            imgUrl: ''
+ *          replies: 
+ *            - text: "Thanks!"
+ *              publisher: 
+ *                name: 'bob'
+ *                email: 'bob@gmail.com'
+ *                imgUrl: ''
  */
 
 
