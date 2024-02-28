@@ -2,6 +2,7 @@ import request from "supertest";
 import initApp from "../app";
 import mongoose from "mongoose";
 import CarModel, { Car } from "../models/car";
+import { Comment } from "../models/comment";
 import { Express } from "express";
 import User from "../models/user";
 import PostModel, { Post } from "../models/post";
@@ -47,11 +48,20 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-const post: Post = {
+const post = {
   _id: "65da55c45ddd0693dd576dd7",
-  publisher: user["_id"],
   car: car._id as string,
 };
+
+const comment = {
+  text: "hey",
+  _id: "65da55c45ddd0693dd576dd8"
+}
+
+const reply = {
+  test: "Hey",
+  _id: "65da55c45ddd0693dd576dd9"
+}
 
 describe("Post tests", () => {
 
@@ -78,14 +88,15 @@ describe("Post tests", () => {
       .set("Authorization", "JWT " + accessToken);
     expect(response.statusCode).toBe(200);
     expect(response.body.length).toBe(1);
-    const reciviedPost = response.body[0];
-    expect(reciviedPost._id).toBe(post._id)
-    expect(reciviedPost.comments.length).toBe(0)
-    expect(reciviedPost.publisher).toBe(user["_id"])
-    expect(reciviedPost.car).toBe(post.car)
+    const recievedPost = response.body[0];
+    expect(recievedPost._id).toBe(post._id)
+    expect(recievedPost.comments.length).toBe(0)
+    expect(recievedPost.publisher).toBe(user["_id"])
+    expect(recievedPost.car).toBe(post.car)
   });
 
   test("Test Post duplicate post", async () => {
+
     const response = await request(app)
       .post("/post")
       .set("Authorization", "JWT " + accessToken)
@@ -93,15 +104,43 @@ describe("Post tests", () => {
     expect(response.statusCode).toBe(409);
   });
 
-  test("Test PUT /post/:id", async () => {
-    const updatedCar = { ...car, price: 35000 };
+  test("Add comment to post", async () => {
     const response = await request(app)
-      .put(`/car/${car._id}`)
+      .post("/post/" + post._id + "/comment")
       .set("Authorization", "JWT " + accessToken)
-      .send(updatedCar);
-    expect(response.statusCode).toBe(200);
-    expect(response.body.price).toBe(updatedCar.price);
+      .send(comment);
+    expect(response.statusCode).toBe(201);
+    const recievedPost = response.body
+    expect(recievedPost._id).toBe(post._id)
+    expect(recievedPost.comments.length).toBe(1)
+    expect(recievedPost.comments[0]).toBe(comment._id)
   });
+
+  test("Add reply to comment", async () => {
+    const postRes = await request(app)
+      .get("/post/" + post._id)
+      .set("Authorization", "JWT " + accessToken);
+    const response = await request(app)
+      .post("/post/" + post._id + "/comment/" + comment["_id"] + "/reply")
+      .set("Authorization", "JWT " + accessToken)
+      .send(reply);
+    expect(response.statusCode).toBe(201)
+    const recievedComment = response.body
+    expect(recievedComment._id).toBe(comment._id)
+    expect(recievedComment.replies.length).toBe(1)
+    expect(recievedComment.replies[0]).toBe(reply._id)
+    expect(recievedComment.publisher).toBe(user["_id"])
+  })
+
+  // test("Test PUT /post/:id", async () => {
+  //   const updatedCar = { ...car, price: 35000 };
+  //   const response = await request(app)
+  //     .put(`/car/${car._id}`)
+  //     .set("Authorization", "JWT " + accessToken)
+  //     .send(updatedCar);
+  //   expect(response.statusCode).toBe(200);
+  //   expect(response.body.price).toBe(updatedCar.price);
+  // });
 
   // test("Test DELETE /car/:id", async () => {
   //   const response = await request(app)

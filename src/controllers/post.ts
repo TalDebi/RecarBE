@@ -45,20 +45,18 @@ class PostController extends BaseController<Post>{
 
     async addComment(req: AuthResquest, res: Response) {
         console.log("add comment to post: " + req.params.postId);
+        req.body.publisher = req.user._id;
 
         const oldObject: Post = await this.model.findById(req.params.postId);
         const newComment = await CommentModel.create(req.body)
-        if (!oldObject) return res.status(404).send("the ID is not exist...");
-
-        oldObject.comments.push(newComment._id)
+        if (!oldObject) return res.status(404).send("The post does not exist...");
 
         try {
             const newObject = await this.model.findByIdAndUpdate(
                 req.params.postId,
-                oldObject,
-                {
-                    returnDocument: "after",
-                }
+                { $push: { comments: newComment._id } },
+                { new: true }
+
             );
             res.status(201).send(newObject);
         } catch (err) {
@@ -69,8 +67,7 @@ class PostController extends BaseController<Post>{
 
     async post(req: AuthResquest, res: Response) {
         console.log("post:" + req.body);
-        const _id = req.user._id;
-        req.body.publisher = _id;
+        req.body.publisher = req.user._id;
         super.post(req, res);
     }
 
@@ -96,7 +93,7 @@ class PostController extends BaseController<Post>{
                         select: ["name", "_id", "email", "imgUrl"]
                     },
                 });
-            
+
             res.send(comment);
         } catch (err) {
             res.status(500).json({ message: err.message });
@@ -155,13 +152,15 @@ class PostController extends BaseController<Post>{
     }
 
     async addReply(req: CommentRequest, res: Response) {
+        req.body.publisher = req.user._id
         try {
             const reply: Comment = await CommentModel.create(req.body)
-            await CommentModel.updateOne(
-                { _id: req.comment._id },
-                { $push: { replies: reply._id } }
+            const newComment = await CommentModel.findByIdAndUpdate(
+                req.comment._id,
+                { $push: { replies: reply._id } },
+                { new: true }
             )
-            res.status(200).send("success");
+            res.status(201).send(newComment);
         } catch (err) {
             console.log(err);
             res.status(500).send("fail: " + err.message);

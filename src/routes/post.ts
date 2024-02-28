@@ -393,7 +393,7 @@ router.post("/", authMiddleware, postController.post.bind(postController));
  *             schema:
  *               $ref: '#/components/schemas/Comment'
  */
-router.post("/:postId/comment", postController.addComment.bind(postController));
+router.post("/:postId/comment", authMiddleware,postController.addComment.bind(postController));
 
 /**
  * @swagger
@@ -428,7 +428,7 @@ router.post("/:postId/comment", postController.addComment.bind(postController));
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Reply'
+ *               $ref: '#/components/schemas/Comment'
  */
 router.post("/:postId/comment/:commentId/reply", [authMiddleware, commentMiddleware], postController.addReply.bind(postController));
 

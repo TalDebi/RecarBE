@@ -5,7 +5,7 @@ export interface Comment {
     _id?: Schema.Types.ObjectId;
     publisher: Schema.Types.ObjectId;
     text: String;
-    replies: Schema.Types.ObjectId[]
+    replies?: Schema.Types.ObjectId[]
 }
 
 const commentSchema = new Schema<Comment>({
