@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import { Car } from "./car";
 import { User } from "./user";
+import commentModel from "./comment"
 
 export interface Post {
   _id?: Schema.Types.ObjectId | string
@@ -27,5 +28,12 @@ const postSchema = new Schema<Post>({
     default: []
   }
 });
+
+postSchema.pre("deleteOne", { document: true }, async function (next) {
+  for (let commentId of this.comments) {
+    await (await commentModel.findById(commentId)).deleteOne();
+  }
+  next();
+})
 
 export default mongoose.model<Post>("Post", postSchema);

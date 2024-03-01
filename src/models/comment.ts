@@ -1,5 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-import { User } from "./user";
 
 export interface Comment {
     _id?: Schema.Types.ObjectId;
@@ -26,5 +25,14 @@ const commentSchema = new Schema<Comment>({
     }
 
 });
+
+commentSchema.pre("deleteOne", { document: true }, async function (next) {
+    for (let commentId of this.replies) {
+        // needed because commentModel is not declared yet
+        await mongoose.model('Comment').deleteOne({ _id: commentId });
+    }
+    next();
+})
+
 
 export default mongoose.model<Comment>("Comment", commentSchema);

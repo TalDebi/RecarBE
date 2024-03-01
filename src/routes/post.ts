@@ -206,12 +206,78 @@ import postController from "../controllers/post";
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     Range:
+ *       type: object
+ *       properties:
+ *         max:
+ *           type: number
+ *         min:
+ *           type: number
+ */
+
+/**
+ * @swagger
  * /post:
  *  get:
  *      summary: get all posts
  *      tags: [Post]
  *      security:
  *          - bearerAuth: []
+ *      parameters:
+ *       - in: query
+ *         name: make
+ *         schema:
+ *           oneOf:
+ *             - type: string
+ *             - type: [string]
+ *       - in: query
+ *         name: model
+ *         schema:
+ *           oneOf:
+ *             - type: string
+ *             - type: [string]
+ *       - in: query
+ *         name: color
+ *         schema:
+ *           oneOf:
+ *             - type: string
+ *             - type: [string]
+ *       - in: query
+ *         name: city
+ *         schema:
+ *           oneOf:
+ *             - type: string
+ *             - type: [string]
+ *       - in: query
+ *         name: hand
+ *         schema:
+ *           oneOf:
+ *             - type: numebr
+ *             - type: [number]
+ *       - in: query 
+ *         name: year
+ *         style: deepObject
+ *         explode: true
+ *         schema:
+ *           Range:
+ *             type: object
+ *             properties:
+ *               max:
+ *                 type: number
+ *               min:
+ *                 type: number
+ *       - in: query
+ *         name: price
+ *         schema:
+ *           $ref:
+ *             '#/components/schemas/Range'
+ *       - in: query
+ *         name: milage
+ *         schema:
+ *           $ref:
+ *             '#/components/schemas/Range'
  *      responses:
  *          200:
  *              description: all Posts
@@ -222,7 +288,7 @@ import postController from "../controllers/post";
  *                          items:
  *                              $ref: '#/components/schemas/Post'
  */
-router.get("/", authMiddleware, postController.get.bind(postController));
+router.get("/", authMiddleware, postController.search.bind(postController));
 
 /**
  * @swagger
@@ -393,7 +459,7 @@ router.post("/", authMiddleware, postController.post.bind(postController));
  *             schema:
  *               $ref: '#/components/schemas/Comment'
  */
-router.post("/:postId/comment", authMiddleware,postController.addComment.bind(postController));
+router.post("/:postId/comment", authMiddleware, postController.addComment.bind(postController));
 
 /**
  * @swagger
