@@ -2,10 +2,10 @@ import request from "supertest";
 import initApp from "../app";
 import mongoose from "mongoose";
 import CarModel, { Car } from "../models/car";
-import { Comment } from "../models/comment";
 import { Express } from "express";
 import User from "../models/user";
 import PostModel, { Post } from "../models/post";
+import CommentModel from "../models/comment";
 
 let objects_to_delete = []
 
@@ -36,15 +36,19 @@ beforeAll(async () => {
 
   User.deleteMany({ email: user.email });
   const response1 = await request(app).post("/auth/register").send(user);
-  await (await request(app).post("/car").send(car)).body._id
+  await CarModel.create(car)
   user['_id'] = response1.body._id
   objects_to_delete.push({ "model": User, "id": user['_id'] })
+  objects_to_delete.push({ "model": CarModel, "id": car['_id'] })
   const response = await request(app).post("/auth/login").send(user);
   accessToken = response.body.accessToken;
 });
 
 afterAll(async () => {
-  await User.deleteOne({ _id: user["_id"] })
+  for (let document of objects_to_delete) {
+    const oldDocument = await document.model.findById(document.id)
+    oldDocument != null && await oldDocument.deleteOne();
+  }
   await mongoose.connection.close();
 });
 
@@ -59,20 +63,11 @@ const comment = {
 }
 
 const reply = {
-  test: "Hey",
+  text: "Hey",
   _id: "65da55c45ddd0693dd576dd9"
 }
 
-describe("Post tests", () => {
-
-  // test("Test Get All Cars - empty response", async () => {
-  //   const response = await request(app)
-  //     .get("/car")
-  //     .set("Authorization", "JWT " + accessToken);
-  //   expect(response.statusCode).toBe(200);
-  //   expect(response.body).toStrictEqual([]);
-  // });
-
+describe("Post post tests", () => {
   test("Test Post post", async () => {
     const response = await request(app)
       .post("/post")
@@ -81,20 +76,6 @@ describe("Post tests", () => {
     expect(response.statusCode).toBe(201);
     objects_to_delete.push({ "model": PostModel, "id": post._id })
   });
-
-  test("Test Get All posts with one post in DB", async () => {
-    const response = await request(app)
-      .get("/post")
-      .set("Authorization", "JWT " + accessToken);
-    expect(response.statusCode).toBe(200);
-    expect(response.body.length).toBe(1);
-    const recievedPost = response.body[0];
-    expect(recievedPost._id).toBe(post._id)
-    expect(recievedPost.comments.length).toBe(0)
-    expect(recievedPost.publisher).toBe(user["_id"])
-    expect(recievedPost.car).toBe(post.car)
-  });
-
   test("Test Post duplicate post", async () => {
 
     const response = await request(app)
@@ -130,22 +111,121 @@ describe("Post tests", () => {
     expect(recievedComment.replies.length).toBe(1)
     expect(recievedComment.replies[0]).toBe(reply._id)
     expect(recievedComment.publisher).toBe(user["_id"])
+  });
+
+})
+
+describe("Post get tests", () => {
+  test("Test Get All posts with one post in DB", async () => {
+    const response = await request(app)
+      .get("/post")
+      .set("Authorization", "JWT " + accessToken);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.length).toBe(1);
+    const recievedPost = response.body[0];
+    expect(recievedPost._id).toBe(post._id)
+    expect(recievedPost.publisher).toBe(user["_id"])
+    expect(recievedPost.car).toBe(post.car)
+  });
+
+  test("Test Get existing post by search", async () => {
+    const response = await request(app)
+      .get("/post")
+      .query({
+        make: ["toyota", "mazda"],
+        year: { min: 1999 },
+        hand: 2,
+      })
+      .set("Authorization", "JWT " + accessToken);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.length).toBe(1);
+    const recievedPost = response.body[0];
+    expect(recievedPost._id).toBe(post._id)
+    expect(recievedPost.comments.length).toBe(1)
+    expect(recievedPost.publisher).toBe(user["_id"])
+    expect(recievedPost.car).toBe(post.car)
+  });
+  test("Test Get non-existing post by search", async () => {
+    const response = await request(app)
+      .get("/post")
+      .query({
+        make: ["toyota", "mazda"],
+        year: { min: 1999 },
+        hand: 2,
+        color: "Green",
+        psdf: 1
+      })
+      .set("Authorization", "JWT " + accessToken);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.length).toBe(0);
+  });
+})
+
+describe("Post put tests", () => {
+  test("Test put diffrent publisher in post", async () => {
+    const diffrentCar = "65da55c45ddd0003dd576eee";
+    const response = await request(app)
+      .put("/post/" + post._id)
+      .set("Authorization", "JWT " + accessToken)
+      .send({ ...post, "car": diffrentCar, "comments": [comment._id] });
+    expect(response.statusCode).toBe(200);
+    expect(response.body.car).toBe(diffrentCar)
+  });
+
+  test("Test put diffrent publisher in comment", async () => {
+    const diffrentText = "esrt";
+    const response = await request(app)
+      .put("/post/" + post._id + "/comment/" + comment._id)
+      .set("Authorization", "JWT " + accessToken)
+      .send({ ...comment, "text": diffrentText, "comment": [reply._id] });
+    expect(response.statusCode).toBe(200);
+    expect(response.body.text).toBe(diffrentText)
   })
 
-  // test("Test PUT /post/:id", async () => {
-  //   const updatedCar = { ...car, price: 35000 };
-  //   const response = await request(app)
-  //     .put(`/car/${car._id}`)
-  //     .set("Authorization", "JWT " + accessToken)
-  //     .send(updatedCar);
-  //   expect(response.statusCode).toBe(200);
-  //   expect(response.body.price).toBe(updatedCar.price);
-  // });
+  test("Test put diffrent publisher in reply", async () => {
+    const diffrentText = "65da55c45ddd0003dd576eee";
+    const response = await request(app)
+      .put("/post/" + post._id + "/comment/" + comment._id + "/reply/" + reply._id)
+      .set("Authorization", "JWT " + accessToken)
+      .send({ ...reply, "text": diffrentText });
+    expect(response.statusCode).toBe(200);
+    expect(response.body.text).toBe(diffrentText)
+  })
+})
 
-  // test("Test DELETE /car/:id", async () => {
-  //   const response = await request(app)
-  //     .delete(`/car/${car._id}`)
-  //     .set("Authorization", "JWT " + accessToken);
-  //   expect(response.statusCode).toBe(200);
-  // });
-});
+
+
+
+
+describe("Post delete tests", () => {
+  test("delete reply from comment", async () => {
+    const response = await request(app)
+      .delete("/post/" + post._id + "/comment/" + comment._id + "/reply/" + reply._id)
+      .set("Authorization", "JWT " + accessToken)
+      .send();
+    const oldObject = await CommentModel.findById(reply._id)
+    expect(response.statusCode).toBe(200);
+    expect(oldObject).toBe(null)
+
+  })
+  test("delete comment from post", async () => {
+    const response = await request(app)
+      .delete("/post/" + post._id + "/comment/" + comment._id)
+      .set("Authorization", "JWT " + accessToken)
+      .send();
+    const oldObject = await CommentModel.findById(comment._id)
+    expect(response.statusCode).toBe(200);
+    expect(oldObject).toBe(null)
+
+  })
+  test("delete post", async () => {
+    const response = await request(app)
+      .delete("/post/" + post._id)
+      .set("Authorization", "JWT " + accessToken)
+      .send();
+    const oldObject = await PostModel.findById(post._id)
+    expect(response.statusCode).toBe(200);
+    expect(oldObject).toBe(null)
+
+  })
+})

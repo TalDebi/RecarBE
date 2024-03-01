@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 import authMiddleware from "../common/auth_middleware";
-import { commentMiddleware, securedCommentMiddleware } from "../common/comment_middleware";
+import { commentMiddleware, securedCommentMiddleware, securedReplyMiddleware } from "../common/comment_middleware";
 import postController from "../controllers/post";
 
 /**
@@ -256,18 +256,17 @@ import postController from "../controllers/post";
  *           oneOf:
  *             - type: numebr
  *             - type: [number]
- *       - in: query 
+ *       - in: query
  *         name: year
  *         style: deepObject
  *         explode: true
  *         schema:
- *           Range:
- *             type: object
- *             properties:
- *               max:
- *                 type: number
- *               min:
- *                 type: number
+ *           type: object
+ *           properties:
+ *             max:
+ *               type: number
+ *             min:
+ *               type: number
  *       - in: query
  *         name: price
  *         schema:
@@ -538,6 +537,51 @@ router.put("/:postId/comment/:commentId", [authMiddleware, securedCommentMiddlew
 
 /**
  * @swagger
+ * /post/{postId}/comment/{commentId}/reply/{replyId}:
+ *   put:
+ *     summary: Edit a reply
+ *     tags: [Post]
+ *     security:
+ *         - bearerAuth: []
+ *     parameters:
+ *        - in: path
+ *          name: postId
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: ID of the post that the comment belongo to
+ *        - in: path
+ *          name: commentId
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: ID of the comment the reply belongs to
+  *        - in: path
+ *          name: replyId
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: ID of the reply to edit
+ *   
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Reply'
+ *     responses:
+ *       200:
+ *         description: The Reply posted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Reply'
+ */
+
+router.put("/:postId/comment/:commentId/reply/:replyId", [authMiddleware, securedReplyMiddleware], postController.editReply.bind(postController))
+
+/**
+ * @swagger
  * /post/{id}:
  *   put:
  *     summary: Edit a post
@@ -628,4 +672,43 @@ router.delete(
  *               $ref: '#/components/schemas/Comment'
  */
 router.delete("/:postId/comment/:commentId", [authMiddleware, securedCommentMiddleware], postController.deleteComment.bind(postController))
+
+
+/**
+ * @swagger
+ * /post/{postId}/comment/{commentId}/reply/{reply}:
+ *   delete:
+ *     summary: delete a reply
+ *     tags: [Post]
+ *     description: need to provide the id of the specific post, comment and reply
+ *     security:
+ *         - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the post of the comment
+ *       - in: path
+ *         name: commentId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the of the comment
+ *       - in: path
+ *         name: replyId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the of the reply
+ *     responses:
+ *       200:
+ *         description: The reply deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Comment'
+ */
+router.delete("/:postId/comment/:commentId/reply/:replyId", [authMiddleware, securedReplyMiddleware], postController.deleteReply.bind(postController))
 export default router;

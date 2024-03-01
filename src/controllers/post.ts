@@ -4,8 +4,7 @@ import { Response } from "express";
 import CommentModel, { Comment } from "../models/comment"
 import { AuthResquest } from "../common/auth_middleware"
 import { CommentRequest } from "../common/comment_middleware"
-import CarModel, { Car } from '../models/car'
-import { ObjectId } from "mongoose";
+import CarModel from '../models/car'
 interface range {
     max?: number;
     min?: number;
@@ -118,33 +117,19 @@ class PostController extends BaseController<Post>{
 
     async editComment(req: CommentRequest, res: Response) {
         try {
-            const newObject = await this.model.findByIdAndUpdate(
+            const newObject = await CommentModel.findByIdAndUpdate(
                 req.params.commentId,
                 req.body,
                 {
                     returnDocument: "after",
                 }
             );
-            res.status(200).send(newObject);
+            res.send(newObject);
         } catch (err) {
             console.log(err);
             res.status(500).send("fail: " + err.message);
         };
-    }
-
-    async deleteById(req: AuthResquest, res: Response) {
-        const oldObject = await this.model.findById(req.params.id);
-
-        if (!oldObject) return res.status(404).send("the ID is not exist...");
-        try {
-            const deletedObject = await this.model.findByIdAndDelete(req.params.id);
-            res.status(200).send(deletedObject);
-        } catch (err) {
-            console.log(err);
-            res.status(500).send("fail: " + err.message);
-        }
-    }
-
+    };
 
     async deleteComment(req: CommentRequest, res: Response) {
         try {
@@ -152,8 +137,22 @@ class PostController extends BaseController<Post>{
                 { _id: req.post._id },
                 { $pull: { comments: req.comment._id } }
             )
-            const deletedObject = await CommentModel.findByIdAndDelete(req.comment._id);
-            res.status(200).send(deletedObject);
+            await req.comment.deleteOne();
+            res.status(200).send(req.comment);
+        } catch (err) {
+            console.log(err);
+            res.status(500).send("fail: " + err.message);
+        }
+    }
+
+    async deleteReply(req: CommentRequest, res: Response) {
+        try {
+            await CommentModel.updateOne(
+                { _id: req.comment._id },
+                { $pull: { replies: req.reply._id } }
+            )
+            await req.reply.deleteOne()
+            res.status(200).send(req.reply);
         } catch (err) {
             console.log(err);
             res.status(500).send("fail: " + err.message);
@@ -176,45 +175,69 @@ class PostController extends BaseController<Post>{
         }
     }
 
+    async editReply(req: CommentRequest, res: Response) {
+        try {
+            const newObject = await CommentModel.findByIdAndUpdate(
+                req.params.replyId,
+                req.body,
+                {
+                    returnDocument: "after",
+                }
+            );
+            res.send(newObject);
+        } catch (err) {
+            console.log(err);
+            res.status(500).send("fail: " + err.message);
+        };
+    };
+
+
 
 
     async search(req: AuthResquest, res: Response) {
         let searchFilters = {};
         let search: SearchQuery = req.query
         for (let queryKey in search) {
-            try {
-                search[queryKey] = JSON.parse(search[queryKey])
-                if (search[queryKey].max != undefined || search[queryKey].min != undefined) {
-                    searchFilters[queryKey] = {
-                        "$gte": search[queryKey].min,
-                        "$lte": search[queryKey].max
-                    }
-                    // Removing undefined from object
-                    Object.keys(searchFilters[queryKey]).forEach(key => searchFilters[queryKey][key] === undefined ? delete searchFilters[queryKey][key] : {});
+            if (!Object.keys(CarModel.schema.paths).includes(queryKey)) {
+                continue;
+            }
 
+            if (search[queryKey].max != undefined || search[queryKey].min != undefined) {
+                searchFilters[queryKey] = {
+                    "$gte": search[queryKey].min,
+                    "$lte": search[queryKey].max
                 }
-                else if (Array.isArray(search[queryKey])) {
-                    searchFilters[queryKey] = {
-                        "$in": search[queryKey]
-                    }
+                // Removing undefined from object
+                Object.keys(searchFilters[queryKey]).forEach(key => searchFilters[queryKey][key] === undefined ? delete searchFilters[queryKey][key] : {});
+
+            }
+            else if (Array.isArray(search[queryKey])) {
+                searchFilters[queryKey] = {
+                    "$in": search[queryKey]
                 }
-            } catch (err) {
+            }
+            else {
                 searchFilters[queryKey] = search[queryKey]
+
+            }
+        }
+        try {
+
+            const cars = await CarModel.find(searchFilters)
+            const carIds = []
+            for (let car of cars) {
+                carIds.push(car._id)
             }
 
+            res.status(200).send(await PostModel.find({
+                car: {
+                    $in: carIds
+                }
+            }))
+        } catch (err) {
+            console.log(err)
+            res.status(500).send(err)
         }
-
-        const cars = await CarModel.find(searchFilters)
-        const carIds = []
-        for (let car of cars) {
-            carIds.push(car._id)
-        }
-
-        res.status(200).send(await PostModel.find({
-            car: {
-                $in: carIds
-            }
-        }))
     }
 
 }

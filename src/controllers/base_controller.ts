@@ -73,9 +73,9 @@ export class BaseController<ModelType> {
     if (!oldObject) return res.status(404).send("the ID is not exist...");
 
     try {
-      const deletedObject = await this.model.findByIdAndDelete(req.params.id);
+      await oldObject.deleteOne()
 
-      res.status(200).send(deletedObject);
+      res.status(200).send(oldObject);
     } catch (err) {
       console.log(err);
       res.status(500).send("fail: " + err.message);
