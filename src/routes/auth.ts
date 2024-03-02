@@ -64,6 +64,31 @@ import authController from "../controllers/auth";
  * @swagger
  * components:
  *   schemas:
+ *     ReducedUser:
+ *       type: object
+ *       required:
+ *         - name
+ *         - email
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: The user name
+ *         email:
+ *           type: string
+ *           description: The user email
+ *         imgUrl:
+ *           type: string
+ *           description: The user imgUrl
+ *       example:
+ *         name: 'bob'
+ *         email: 'bob@gmail.com'
+ *         imgUrl: ''
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
  *     Tokens:
  *       type: object
  *       required:

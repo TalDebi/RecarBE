@@ -39,7 +39,7 @@ export class BaseController<ModelType> {
       res.status(201).send(obj);
     } catch (err) {
       console.log(err);
-      res.status(406).send("fail: " + err.message);
+      res.status(409).send("fail: " + err.message);
     }
   }
 
@@ -58,7 +58,7 @@ export class BaseController<ModelType> {
           returnDocument: "after",
         }
       );
-      res.status(201).send(newObject);
+      res.status(200).send(newObject);
     } catch (err) {
       console.log(err);
       res.status(500).send("fail: " + err.message);
@@ -73,9 +73,9 @@ export class BaseController<ModelType> {
     if (!oldObject) return res.status(404).send("the ID is not exist...");
 
     try {
-      const deletedObject = await this.model.findByIdAndDelete(req.params.id);
+      await oldObject.deleteOne()
 
-      res.status(201).send(deletedObject);
+      res.status(200).send(oldObject);
     } catch (err) {
       console.log(err);
       res.status(500).send("fail: " + err.message);

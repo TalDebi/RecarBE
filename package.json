@@ -6,7 +6,8 @@
   "scripts": {
     "test": "tsc && jest --detectOpenHandles --forceExit",
     "testAuth": "tsc && jest --detectOpenHandles --forceExit ./src/tests/auth.test.ts",
-    "testPost": "tsc && jest --detectOpenHandles --forceExit --runInBand ./src/tests/student_post.test.ts",
+    "testCar": "tsc && jest --detectOpenHandles --forceExit --runInBand ./src/tests/car.test.ts",
+    "testPost": "tsc && jest --detectOpenHandles --forceExit --runInBand ./src/tests/post.test.ts",
     "testFile": "tsc && jest --detectOpenHandles --forceExit --runInBand ./src/tests/file.test.ts",
     "start": "tsc && node ./dist/src/server.js",
     "dev": "nodemon ./src/server.ts",
@@ -29,7 +30,7 @@
     "@types/jsonwebtoken": "^9.0.5",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.1",
     "dotenv": "^16.3.1",
     "eslint": "^8.55.0",
@@ -44,6 +45,7 @@
     "typescript": "^5.3.3"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/jest": "^29.5.11",
     "@types/multer": "^1.4.11",
     "@types/supertest": "^2.0.16",

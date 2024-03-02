@@ -10,6 +10,7 @@ let accessToken: string;
 const user = {
   email: "testStudent@test.com",
   password: "1234567890",
+  name: "Testy"
 };
 beforeAll(async () => {
   app = await initApp();
@@ -17,7 +18,7 @@ beforeAll(async () => {
   await CarModel.deleteMany();
 
   User.deleteMany({ email: user.email });
-  await request(app).post("/auth/register").send(user);
+  const response2 = await request(app).post("/auth/register").send(user);
   const response = await request(app).post("/auth/login").send(user);
   accessToken = response.body.accessToken;
 });
@@ -27,7 +28,7 @@ afterAll(async () => {
 });
 
 const car: Car = {
-  _id: "11111111",
+  _id: "65da55c45ddd0693dd576dd7",
   make: "toyota",
   model: "camry",
   year: 2010,
@@ -80,10 +81,10 @@ describe("Car tests", () => {
 
   test("Test Post duplicate Car", async () => {
     const response = await request(app)
-      .post("/student")
+      .post("/car")
       .set("Authorization", "JWT " + accessToken)
       .send(car);
-    expect(response.statusCode).toBe(406);
+    expect(response.statusCode).toBe(409);
   });
 
   test("Test PUT /car/:id", async () => {
@@ -92,7 +93,7 @@ describe("Car tests", () => {
       .put(`/car/${car._id}`)
       .set("Authorization", "JWT " + accessToken)
       .send(updatedCar);
-    expect(response.statusCode).toBe(201);
+    expect(response.statusCode).toBe(200);
     expect(response.body.price).toBe(updatedCar.price);
   });
 
@@ -100,6 +101,6 @@ describe("Car tests", () => {
     const response = await request(app)
       .delete(`/car/${car._id}`)
       .set("Authorization", "JWT " + accessToken);
-    expect(response.statusCode).toBe(201);
+    expect(response.statusCode).toBe(200);
   });
 });

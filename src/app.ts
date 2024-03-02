@@ -4,7 +4,7 @@ import express, { Express } from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import CarRoute from "./routes/car";
-import studentPostRoute from "./routes/student_post_route";
+import PostRouter from "./routes/post"
 import authRoute from "./routes/auth";
 import fileRoute from "./routes/file_route";
 
@@ -14,7 +14,7 @@ const initApp = (): Promise<Express> => {
     db.once("open", () => console.log("Connected to Database"));
     db.on("error", (error) => console.error(error));
     const url = process.env.DB_URL;
-    mongoose.connect(url!).then(() => {
+    mongoose.connect(url).then(() => {
       const app = express();
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: true }));
@@ -25,9 +25,9 @@ const initApp = (): Promise<Express> => {
         next();
       });
       app.use("/car", CarRoute);
-      app.use("/studentpost", studentPostRoute);
       app.use("/auth", authRoute);
       app.use("/file", fileRoute);
+      app.use("/post", PostRouter)
       app.use("/public", express.static("public"));
       resolve(app);
     });
