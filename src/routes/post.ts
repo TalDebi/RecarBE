@@ -261,19 +261,19 @@ import postController from "../controllers/post";
  *         style: deepObject
  *         explode: true
  *         schema:
- *           type: object
- *           properties:
- *             max:
- *               type: number
- *             min:
- *               type: number
+ *           $ref:
+ *             '#/components/schemas/Range'
  *       - in: query
  *         name: price
+ *         style: deepObject
+ *         explode: true
  *         schema:
  *           $ref:
  *             '#/components/schemas/Range'
  *       - in: query
  *         name: milage
+ *         style: deepObject
+ *         explode: true
  *         schema:
  *           $ref:
  *             '#/components/schemas/Range'
