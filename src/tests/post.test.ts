@@ -47,7 +47,7 @@ beforeAll(async () => {
 afterAll(async () => {
   for (let document of objects_to_delete) {
     const oldDocument = await document.model.findById(document.id)
-    oldDocument != null && await oldDocument.deleteOne();
+    oldDocument !== null && await oldDocument.deleteOne();
   }
   await mongoose.connection.close();
 });

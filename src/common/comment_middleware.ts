@@ -33,7 +33,7 @@ export const securedCommentMiddleware = async (req: CommentRequest, res: Respons
     if (!post.comments.includes(comment._id)) {
       return res.status(400).send("Comment does not belong to post")
     }
-    if (req.user._id != (String(comment.publisher))) {
+    if (req.user._id !== (String(comment.publisher))) {
       return res.status(401).send("Comment does not belong to user")
     }
     req.comment = comment
@@ -56,7 +56,7 @@ export const securedReplyMiddleware = async (req: CommentRequest, res: Response,
     if (!comment.replies.includes(reply._id)) {
       return res.status(400).send("Reply does not belong to comment")
     }
-    if (req.user._id != (String(reply.publisher))) {
+    if (req.user._id !== (String(reply.publisher))) {
       return res.status(401).send("Comment does not belong to user")
     }
     req.comment = comment

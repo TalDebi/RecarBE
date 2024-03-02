@@ -340,69 +340,9 @@ router.get("/:id", authMiddleware, postController.getById.bind(postController));
  */
 router.get("/:id/populated", authMiddleware, postController.getPopulatedPost.bind(postController));
 
-/**
- * @swagger
- * /post/{postId}/comment/{commentId}:
- *  get:
- *      summary: get a comment by id
- *      tags: [Post]
- *      description: Get a comment by Id
- *      security:
- *          - bearerAuth: []
- *      parameters:
- *       - in: path
- *         name: postId
- *         schema:
- *           type: string
- *         required: true
- *         description: ID of the post of the comment
- *       - in: path
- *         name: commentId
- *         schema:
- *           type: string
- *         required: true
- *         description: ID of the of the comment
- *      responses:
- *        200:
- *          description: The comment
- *          content:
- *            application/json:
- *              schema:
- *                $ref: '#/components/schemas/Comment'
- */
-router.get("/:postId/comment/:commentId", [authMiddleware, commentMiddleware], postController.getComment.bind(postController))
 
-/**
- * @swagger
- * /post/{postId}/comment/{commentId}/populated:
- *  get:
- *      summary: get a comment by id already populated
- *      tags: [Post]
- *      description: Get a comment by Id already populated
- *      security:
- *          - bearerAuth: []
- *      parameters:
- *       - in: path
- *         name: postId
- *         schema:
- *           type: string
- *         required: true
- *         description: ID of the post of the comment
- *       - in: path
- *         name: commentId
- *         schema:
- *           type: string
- *         required: true
- *         description: ID of the of the comment
- *      responses:
- *        200:
- *          description: The comment populated
- *          content:
- *            application/json:
- *              schema:
- *                $ref: '#/components/schemas/PopulatedComment'
- */
-router.get("/:postId/comment/:commentId/populated", [authMiddleware, commentMiddleware], postController.getPopulatedComment.bind(postController))
+
+
 
 /**
  * @swagger

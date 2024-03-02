@@ -86,34 +86,7 @@ class PostController extends BaseController<Post>{
         super.post(req, res);
     }
 
-    async getComment(req: CommentRequest, res: Response) {
-        console.log("get commnet: " + req.comment._id + " of post " + req.post._id)
-        try {
-            res.send(req.comment);
-        } catch (err) {
-            console.log(err);
-            res.status(500).json({ message: err.message });
-        }
-    }
-    async getPopulatedComment(req: CommentRequest, res: Response) {
-        try {
-            const comment: Comment = await CommentModel.findById(req.comment._id)
-                .populate(
-                    "publisher",
-                    ["name", "_id", "email", "imgUrl"])
-                .populate({
-                    path: "replies",
-                    populate: {
-                        path: 'publisher',
-                        select: ["name", "_id", "email", "imgUrl"]
-                    },
-                });
 
-            res.send(comment);
-        } catch (err) {
-            res.status(500).json({ message: err.message });
-        }
-    }
 
     async editComment(req: CommentRequest, res: Response) {
         try {
@@ -202,13 +175,13 @@ class PostController extends BaseController<Post>{
                 continue;
             }
 
-            if (search[queryKey].max != undefined || search[queryKey].min != undefined) {
+            if (search[queryKey].max !== undefined || search[queryKey].min != undefined) {
                 searchFilters[queryKey] = {
                     "$gte": search[queryKey].min,
                     "$lte": search[queryKey].max
                 }
                 // Removing undefined from object
-                Object.keys(searchFilters[queryKey]).forEach(key => searchFilters[queryKey][key] === undefined ? delete searchFilters[queryKey][key] : {});
+                Object.keys(searchFilters[queryKey]).forEach(key => searchFilters[queryKey][key] ? delete searchFilters[queryKey][key] : {});
 
             }
             else if (Array.isArray(search[queryKey])) {
