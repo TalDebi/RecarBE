@@ -84,35 +84,6 @@ import authMiddleware from "../common/auth_middleware";
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     ArrayOfCars:
- *       type: array
- *       items:
- *         $ref: '#/components/schemas/Car'
- *       example:
- *         - make: 'toyota'
- *           model: 'camry'
- *           year: 1993
- *           price: 20000
- *           hand: 3
- *           color : 'white'
- *           mileage: 200000
- *           city: 'Holon'
- *           owner: '1234567'
- *         - make: 'toyota'
- *           model: 'camry'
- *           year: 2010
- *           price: 40000
- *           hand: 2
- *           color : 'black'
- *           mileage: 100000
- *           city: 'Holon'
- *           owner: '1234567'
- */
-
-/**
- * @swagger
  * /car:
  *  get:
  *      summary: get all cars
@@ -125,7 +96,9 @@ import authMiddleware from "../common/auth_middleware";
  *              content:
  *                  application/json:
  *                      schema:
- *                          $ref: '#/components/schemas/ArrayOfCars'
+ *                        type: array
+ *                        items:
+ *                          $ref: '#/components/schemas/Car'
  */
 router.get("/", authMiddleware, CarController.get.bind(CarController));
 
