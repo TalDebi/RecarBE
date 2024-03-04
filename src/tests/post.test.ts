@@ -1,10 +1,10 @@
 import request from "supertest";
 import initApp from "../app";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import CarModel, { Car } from "../models/car";
 import { Express } from "express";
 import User from "../models/user";
-import PostModel, { Post } from "../models/post";
+import PostModel from "../models/post";
 import CommentModel from "../models/comment";
 
 let objects_to_delete = []
@@ -18,7 +18,7 @@ let user = {
   name: "Testy",
 };
 const car: Car = {
-  _id: "65da55c45ddd0693dd576dd7",
+  _id: new Types.ObjectId("65da55c45ddd0693dd576dd7"),
   make: "toyota",
   model: "camry",
   year: 2010,
@@ -54,7 +54,7 @@ afterAll(async () => {
 
 const post = {
   _id: "65da55c45ddd0693dd576dd7",
-  car: car._id as string,
+  car: car._id,
 };
 
 const comment = {
@@ -125,7 +125,7 @@ describe("Post get tests", () => {
     const recievedPost = response.body[0];
     expect(recievedPost._id).toBe(post._id)
     expect(recievedPost.publisher).toBe(user["_id"])
-    expect(recievedPost.car).toBe(post.car)
+    expect(recievedPost.car).toBe(String(post.car))
   });
 
   test("Test Get existing post by search", async () => {
@@ -143,7 +143,7 @@ describe("Post get tests", () => {
     expect(recievedPost._id).toBe(post._id)
     expect(recievedPost.comments.length).toBe(1)
     expect(recievedPost.publisher).toBe(user["_id"])
-    expect(recievedPost.car).toBe(post.car)
+    expect(recievedPost.car).toBe(String(post.car))
   });
   test("Test Get non-existing post by search", async () => {
     const response = await request(app)

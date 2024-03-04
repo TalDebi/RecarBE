@@ -19,7 +19,6 @@ const commentSchema = new Schema<Comment>({
     },
     replies: {
         type: [Schema.Types.ObjectId],
-        required: true,
         ref: 'Comment',
         default: []
     }

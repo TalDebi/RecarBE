@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import CarModel, { Car } from "../models/car";
 import { Express } from "express";
 import User from "../models/user";
+import { Types } from "mongoose";
 
 let app: Express;
 let accessToken: string;
@@ -18,7 +19,6 @@ beforeAll(async () => {
   await CarModel.deleteMany();
 
   User.deleteMany({ email: user.email });
-  const response2 = await request(app).post("/auth/register").send(user);
   const response = await request(app).post("/auth/login").send(user);
   accessToken = response.body.accessToken;
 });
@@ -28,7 +28,7 @@ afterAll(async () => {
 });
 
 const car: Car = {
-  _id: "65da55c45ddd0693dd576dd7",
+  _id: new Types.ObjectId("65da55c45ddd0693dd576dd7"),
   make: "toyota",
   model: "camry",
   year: 2010,

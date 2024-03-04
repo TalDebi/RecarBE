@@ -4,10 +4,10 @@ import { User } from "./user";
 import commentModel from "./comment"
 
 export interface Post {
-  _id?: Schema.Types.ObjectId | string
+  _id?: Schema.Types.ObjectId
   car: Car | string;
   publisher: User | string;
-  comments?: (Schema.Types.ObjectId | string)[];
+  comments?: Schema.Types.ObjectId[];
 }
 
 const postSchema = new Schema<Post>({

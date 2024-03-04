@@ -181,8 +181,7 @@ class PostController extends BaseController<Post>{
                     "$lte": search[queryKey].max
                 }
                 // Removing undefined from object
-                Object.keys(searchFilters[queryKey]).forEach(key => searchFilters[queryKey][key] ? delete searchFilters[queryKey][key] : {});
-
+                Object.keys(searchFilters[queryKey]).forEach(key => searchFilters[queryKey][key] ? {} : delete searchFilters[queryKey][key]);
             }
             else if (Array.isArray(search[queryKey])) {
                 searchFilters[queryKey] = {
