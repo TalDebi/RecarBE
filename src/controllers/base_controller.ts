@@ -17,7 +17,15 @@ export class BaseController<ModelType> {
         return false;
       }
 
-      if (body[path] && typeof body[path] !== schemaPath.instance) {
+      const schemaPathInstance =
+        schemaPath.instance.toLowerCase() !== "objectid"
+          ? schemaPath.instance.toLowerCase()
+          : "string";
+
+      if (
+        body[path] &&
+        (typeof body[path])?.toString().toLowerCase() !== schemaPathInstance
+      ) {
         return false;
       }
     }
