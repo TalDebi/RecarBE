@@ -29,6 +29,9 @@ import authController from "../controllers/auth";
  *         - email
  *         - password
  *       properties:
+ *         _id:
+ *           type: string
+ *           description: id
  *         name:
  *           type: string
  *           description: The user name
@@ -48,16 +51,18 @@ import authController from "../controllers/auth";
  *           type: string[]
  *           description: The user refresh tokens
  *         likedPosts:
- *           type: string[]
- *           description: The user liked posts ID`s
+ *           type: Array
+ *           description: Array of objectIds of liked posts
+ *           items:
+ *             type: string
  *       example:
  *         name: 'bob'
  *         email: 'bob@gmail.com'
  *         password: '123456'
  *         phoneNumber: '054-2355489'
  *         imgUrl: ''
- *         refreshTokens: []
- *         likedPosts: []
+ *         refreshTokens: ["56cb91bdc3464f14678934ca", "56cb91bdc3464f14678934ca"]
+ *         likedPosts: ["56cb91bdc3464f14678934ca", "56cb91bdc3464f14678934ca"]
  */
 
 /**
@@ -128,7 +133,44 @@ import authController from "../controllers/auth";
  */
 router.post("/register", authController.register);
 
-router.post("/google", authController.googleSignin);
+/**
+ * @swagger
+ * /auth/google:
+ *   post:
+ *     summary: Authenticate user using Google Sign-In
+ *     description: Authenticates a user using Google Sign-In and returns user information.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               credential:
+ *                 type: string
+ *                 description: Google ID token obtained from client
+ *             required:
+ *               - credential
+ *     responses:
+ *       '200':
+ *         description: Successful sign-in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       '400':
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message
+ */
+router.post("/google", authController.googleSignUp);
 
 /**
  * @swagger

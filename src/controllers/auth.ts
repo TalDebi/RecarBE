@@ -6,7 +6,7 @@ import { OAuth2Client } from "google-auth-library";
 import { Document } from "mongoose";
 
 const client = new OAuth2Client();
-const googleSignin = async (req: Request, res: Response) => {
+const googleSignUp = async (req: Request, res: Response) => {
   console.log(req.body);
   try {
     const ticket = await client.verifyIdToken({
@@ -26,7 +26,7 @@ const googleSignin = async (req: Request, res: Response) => {
         });
       }
       const tokens = await generateTokens(user);
-      res.status(200).send({
+      return res.status(201).send({
         email: user.email,
         _id: user._id,
         imgUrl: user.imgUrl,
@@ -34,7 +34,14 @@ const googleSignin = async (req: Request, res: Response) => {
       });
     }
   } catch (err) {
-    return res.status(400).send(err.message);
+    if (
+      err.name === "FirebaseAuthError" &&
+      err.code === "auth/id-token-expired"
+    ) {
+      return res.status(401).send("ID token expired");
+    }
+
+    return res.status(500).send(err.message);
   }
 };
 
@@ -50,7 +57,7 @@ const register = async (req: Request, res: Response) => {
   try {
     const rs = await UserModel.findOne({ email: email });
     if (rs != null) {
-      return res.status(406).send("email already exists");
+      return res.status(409).send("email already exists");
     }
     const salt = await bcrypt.genSalt(10);
     const encryptedPassword = await bcrypt.hash(password, salt);
@@ -62,7 +69,7 @@ const register = async (req: Request, res: Response) => {
       imgUrl: imgUrl,
     });
     const tokens = await generateTokens(rs2);
-    res.status(201).send({
+    return res.status(201).send({
       name: rs2.name,
       email: rs2.email,
       phoneNumber: rs2.phoneNumber,
@@ -71,7 +78,7 @@ const register = async (req: Request, res: Response) => {
       ...tokens,
     });
   } catch (err) {
-    return res.status(400).send("error missing email or password");
+    return res.status(500).send("Internal Server Error");
   }
 };
 
@@ -114,7 +121,7 @@ const login = async (req: Request, res: Response) => {
     const tokens = await generateTokens(user);
     return res.status(200).send(tokens);
   } catch (err) {
-    return res.status(400).send("error missing email or password");
+    return res.status(500).send("Internal Server Error");
   }
 };
 
@@ -145,7 +152,7 @@ const logout = async (req: Request, res: Response) => {
           return res.sendStatus(200);
         }
       } catch (err) {
-        res.sendStatus(401).send(err.message);
+        return res.sendStatus(500).send(err.message);
       }
     }
   );
@@ -192,14 +199,14 @@ const refresh = async (req: Request, res: Response) => {
           refreshToken: refreshToken,
         });
       } catch (err) {
-        res.sendStatus(401).send(err.message);
+        return res.sendStatus(500).send(err.message);
       }
     }
   );
 };
 
 export default {
-  googleSignin,
+  googleSignUp,
   register,
   login,
   logout,

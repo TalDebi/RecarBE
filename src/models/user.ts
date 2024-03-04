@@ -1,17 +1,22 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
+import { Post } from "./post";
 
 export interface User {
-  _id?: string;
+  _id?: Schema.Types.ObjectId | string;
   name: string;
   email: string;
   password: string;
   phoneNumber?: string;
   imgUrl?: string;
   refreshTokens?: string[];
-  likedPosts?: string[];
+  likedPosts?: (Post | string)[];
 }
 
 const userSchema = new mongoose.Schema<User>({
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: new mongoose.Types.ObjectId(),
+  },
   name: {
     type: String,
     required: true,
@@ -34,7 +39,9 @@ const userSchema = new mongoose.Schema<User>({
     type: [String],
   },
   likedPosts: {
-    type: [String],
+    type: [Schema.Types.ObjectId],
+    ref: "Post",
+    default: [],
   },
 });
 
