@@ -84,6 +84,12 @@ class PostController extends BaseController<Post> {
     return super.post(req, res);
   }
 
+  async putById(req: AuthResquest, res: Response) {
+    console.log("put:" + req.body);
+    req.body.publisher = req.user._id;
+    return super.putById(req, res);
+  }
+
   async editComment(req: CommentRequest, res: Response) {
     try {
       const newObject = await CommentModel.findByIdAndUpdate(
@@ -179,8 +185,9 @@ class PostController extends BaseController<Post> {
         // Removing undefined from object
         Object.keys(searchFilters[queryKey]).forEach((key) =>
           searchFilters[queryKey][key]
-            ? delete searchFilters[queryKey][key]
-            : {}
+            ? {}
+            : delete searchFilters[queryKey][key]
+
         );
       } else if (Array.isArray(search[queryKey])) {
         searchFilters[queryKey] = {

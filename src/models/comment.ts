@@ -23,7 +23,6 @@ const commentSchema = new Schema<Comment>({
   },
   replies: {
     type: [Schema.Types.ObjectId],
-    required: true,
     ref: "Comment",
     default: [],
   },
@@ -32,7 +31,9 @@ const commentSchema = new Schema<Comment>({
 commentSchema.pre("deleteOne", { document: true }, async function (next) {
   for (let replyId of this.replies) {
     // needed because commentModel is not declared yet
-    await mongoose.model("Comment").deleteOne({ _id: replyId });
+
+    const oldDocument = await mongoose.model("Comment").findById(replyId);
+    oldDocument !== null && (await oldDocument.deleteOne());
   }
   next();
 });

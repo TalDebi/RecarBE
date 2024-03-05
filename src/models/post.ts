@@ -5,10 +5,10 @@ import CommentModel from "./comment";
 import CarModel from "./car";
 
 export interface Post {
-  _id?: Schema.Types.ObjectId | string;
+  _id?: Schema.Types.ObjectId;
   car: Car | string;
   publisher: User | string;
-  comments?: (Schema.Types.ObjectId | string)[];
+  comments?: Schema.Types.ObjectId[];
 }
 
 const postSchema = new Schema<Post>({
@@ -28,18 +28,17 @@ const postSchema = new Schema<Post>({
   },
   comments: {
     type: [Schema.Types.ObjectId],
-    required: true,
     ref: "Comment",
     default: [],
   },
 });
 
 postSchema.pre("deleteOne", { document: true }, async function (next) {
-  for (let commentId of this.comments) {
-    await (await CommentModel.findById(commentId)).deleteOne();
+  for (let commentId of this.comments) {    const oldDocument = await CommentModel.findById(commentId);
+    oldDocument !== null && (await oldDocument.deleteOne());
   }
-
-  await (await CarModel.findById(this.car)).deleteOne();
+  const oldDocument = await CarModel.findById(this.car);
+  oldDocument !== null && (await oldDocument.deleteOne());
 
   next();
 });
