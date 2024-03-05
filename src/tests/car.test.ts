@@ -4,31 +4,18 @@ import mongoose from "mongoose";
 import CarModel, { Car } from "../models/car";
 import { Express } from "express";
 import User from "../models/user";
+import { Types } from "mongoose";
 
 let app: Express;
+let userId: string
 let accessToken: string;
 const user = {
   email: "testStudent@test.com",
   password: "1234567890",
   name: "Testy"
 };
-beforeAll(async () => {
-  app = await initApp();
-  console.log("beforeAll");
-  await CarModel.deleteMany();
-
-  User.deleteMany({ email: user.email });
-  const response2 = await request(app).post("/auth/register").send(user);
-  const response = await request(app).post("/auth/login").send(user);
-  accessToken = response.body.accessToken;
-});
-
-afterAll(async () => {
-  await mongoose.connection.close();
-});
-
-const car: Car = {
-  _id: "65da55c45ddd0693dd576dd7",
+const car:Car= {
+  _id: new Types.ObjectId("65da55c45ddd0693dd576dd7"),
   make: "toyota",
   model: "camry",
   year: 2010,
@@ -37,8 +24,26 @@ const car: Car = {
   color: "black",
   mileage: 100000,
   city: "Holon",
-  owner: "1234567",
+  owner:""
 };
+beforeAll(async () => {
+  app = await initApp();
+  console.log("beforeAll");
+  await CarModel.deleteMany();
+
+  User.deleteMany({ email: user.email });
+  const response1 = await request(app).post("/auth/register").send(user);
+  userId = response1.body._id
+  car["owner"] = userId;
+  const response = await request(app).post("/auth/login").send(user);
+  accessToken = response.body.accessToken;
+});
+
+afterAll(async () => {
+  await User.findByIdAndDelete(userId)
+  await mongoose.connection.close();
+});
+
 
 describe("Car tests", () => {
   const addCar = async (car: Car) => {
@@ -67,7 +72,7 @@ describe("Car tests", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.length).toBe(1);
     const postedCar = response.body[0];
-    expect(postedCar._id).toBe(car._id);
+    expect(postedCar._id).toBe(String(car._id));
     expect(postedCar.make).toBe(car.make);
     expect(postedCar.model).toBe(car.model);
     expect(postedCar.year).toBe(car.year);

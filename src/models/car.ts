@@ -1,7 +1,8 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
+import { User } from "./user";
 
 export interface Car {
-  _id?: mongoose.Schema.Types.ObjectId | string;
+  _id?: mongoose.Types.ObjectId;
   make: string;
   model: string;
   year: number;
@@ -10,14 +11,14 @@ export interface Car {
   color: string;
   mileage: number;
   city: string;
-  owner: string;
+  owner: User | string;
   imgsUrls?: string[];
 }
 
 const carSchema = new mongoose.Schema<Car>({
   _id: {
     type: mongoose.Schema.Types.ObjectId,
-    default: new mongoose.Types.ObjectId()
+    default: new mongoose.Types.ObjectId(),
   },
   make: {
     type: String,
@@ -52,8 +53,9 @@ const carSchema = new mongoose.Schema<Car>({
     required: true,
   },
   owner: {
-    type: String,
+    type: Schema.Types.ObjectId,
     required: true,
+    ref: "User",
   },
   imgsUrls: {
     type: [String],
