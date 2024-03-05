@@ -34,12 +34,12 @@ const postSchema = new Schema<Post>({
 });
 
 postSchema.pre("deleteOne", { document: true }, async function (next) {
-  for (let commentId of this.comments) {
-    const oldDocument = await CommentModel.findById(commentId);
+  for (let commentId of this.comments) {    const oldDocument = await CommentModel.findById(commentId);
     oldDocument !== null && (await oldDocument.deleteOne());
   }
   const oldDocument = await CarModel.findById(this.car);
   oldDocument !== null && (await oldDocument.deleteOne());
+
   next();
 });
 

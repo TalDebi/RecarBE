@@ -187,6 +187,7 @@ class PostController extends BaseController<Post> {
           searchFilters[queryKey][key]
             ? {}
             : delete searchFilters[queryKey][key]
+
         );
       } else if (Array.isArray(search[queryKey])) {
         searchFilters[queryKey] = {

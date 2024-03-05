@@ -22,6 +22,7 @@ export class BaseController<ModelType> {
           ? schemaPath.instance.toLowerCase() === "array"
             ? "object"
             : schemaPath.instance.toLowerCase()
+
           : "string";
 
       if (
@@ -77,6 +78,7 @@ export class BaseController<ModelType> {
       if (err.message.includes("E11000")) {
         return res.status(409).send("fail: " + err.message);
       }
+      console.log(err);
       return res.status(500).send("fail: " + err.message);
     }
   }

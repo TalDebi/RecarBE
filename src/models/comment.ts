@@ -31,6 +31,7 @@ const commentSchema = new Schema<Comment>({
 commentSchema.pre("deleteOne", { document: true }, async function (next) {
   for (let replyId of this.replies) {
     // needed because commentModel is not declared yet
+
     const oldDocument = await mongoose.model("Comment").findById(replyId);
     oldDocument !== null && (await oldDocument.deleteOne());
   }
