@@ -1,6 +1,7 @@
 import express from "express";
 const router = express.Router();
 import authController from "../controllers/auth";
+import authMiddleware from "../common/auth_middleware";
 /**
  * @swagger
  * tags:
@@ -113,6 +114,27 @@ import authController from "../controllers/auth";
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     UserCredentials:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *       properties:
+ *         email:
+ *           type: string
+ *           description: The user email
+ *         password:
+ *           type: string
+ *           description: The user password
+ *       example:
+ *         email: 'bob@gmail.com'
+ *         password: '134r2134cr1x3c'
+ */
+
+/**
+ * @swagger
  * /auth/register:
  *   post:
  *     summary: registers a new user
@@ -125,13 +147,18 @@ import authController from "../controllers/auth";
  *             $ref: '#/components/schemas/User'
  *     responses:
  *       200:
- *         description: The new user
+ *         description: The access & refresh tokens along with user data
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 tokens:
+ *                   $ref: '#/components/schemas/Tokens'
  */
-router.post("/register", authController.register);
+router.post("/register", authController.register.bind(authController));
 
 /**
  * @swagger
@@ -170,7 +197,7 @@ router.post("/register", authController.register);
  *                   type: string
  *                   description: Error message
  */
-router.post("/google", authController.googleSignUp);
+router.post("/google", authController.googleSignUp.bind(authController));
 
 /**
  * @swagger
@@ -183,16 +210,53 @@ router.post("/google", authController.googleSignUp);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/User'
+ *             $ref: '#/components/schemas/UserCredentials'
  *     responses:
  *       200:
- *         description: The acess & refresh tokens
+ *         description: The access & refresh tokens along with user data
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Tokens'
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 tokens:
+ *                   $ref: '#/components/schemas/Tokens'
  */
-router.post("/login", authController.login);
+router.post("/login", authController.login.bind(authController));
+
+/**
+ * @swagger
+ * /auth/{userId}:
+ *   put:
+ *     summary: edit user details
+ *     tags: [Auth]
+ *     description: need to provide the id of the specific user
+ *     security:
+ *         - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the user to put
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       200:
+ *         description: The new car
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ */
+router.put("/:id", authMiddleware, authController.putById.bind(authController));
 
 /**
  * @swagger
@@ -207,7 +271,7 @@ router.post("/login", authController.login);
  *       200:
  *         description: logout completed successfully
  */
-router.get("/logout", authController.logout);
+router.get("/logout", authController.logout.bind(authController));
 
 /**
  * @swagger
@@ -226,6 +290,6 @@ router.get("/logout", authController.logout);
  *                      schema:
  *                          $ref: '#/components/schemas/Tokens'
  */
-router.get("/refresh", authController.refresh);
+router.get("/refresh", authController.refresh.bind(authController));
 
 export default router;

@@ -7,14 +7,14 @@ import User from "../models/user";
 import { Types } from "mongoose";
 
 let app: Express;
-let userId: string
+let userId: string;
 let accessToken: string;
 const user = {
   email: "testStudent@test.com",
   password: "1234567890",
-  name: "Testy"
+  name: "Testy",
 };
-const car:Car= {
+const car: Car = {
   _id: new Types.ObjectId("65da55c45ddd0693dd576dd7"),
   make: "toyota",
   model: "camry",
@@ -24,7 +24,7 @@ const car:Car= {
   color: "black",
   mileage: 100000,
   city: "Holon",
-  owner:""
+  owner: "",
 };
 beforeAll(async () => {
   app = await initApp();
@@ -33,17 +33,16 @@ beforeAll(async () => {
 
   User.deleteMany({ email: user.email });
   const response1 = await request(app).post("/auth/register").send(user);
-  userId = response1.body._id
+  userId = response1.body.user._id;
   car["owner"] = userId;
   const response = await request(app).post("/auth/login").send(user);
-  accessToken = response.body.accessToken;
+  accessToken = response.body.tokens.accessToken;
 });
 
 afterAll(async () => {
-  await User.findByIdAndDelete(userId)
+  await User.findByIdAndDelete(userId);
   await mongoose.connection.close();
 });
-
 
 describe("Car tests", () => {
   const addCar = async (car: Car) => {

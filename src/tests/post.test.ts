@@ -24,14 +24,14 @@ beforeAll(async () => {
 
   User.deleteMany({ email: user.email });
   const response1 = await request(app).post("/auth/register").send(user);
-  user["_id"] = response1.body._id;
+  user["_id"] = response1.body.user._id;
   car["owner"] = user["_id"];
-  post["car"] = car._id
+  post["car"] = car._id;
   await CarModel.create(car);
   objects_to_delete.push({ model: User, id: user["_id"] });
   objects_to_delete.push({ model: CarModel, id: car["_id"] });
   const response = await request(app).post("/auth/login").send(user);
-  accessToken = response.body.accessToken;
+  accessToken = response.body.tokens.accessToken;
 });
 
 afterAll(async () => {
