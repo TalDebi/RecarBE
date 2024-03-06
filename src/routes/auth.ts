@@ -98,27 +98,6 @@ import authMiddleware from "../common/auth_middleware";
  *     Tokens:
  *       type: object
  *       required:
- *         - email
- *         - password
- *       properties:
- *         email:
- *           type: string
- *           description: The user email
- *         password:
- *           type: string
- *           description: The user password
- *       example:
- *         email: 'bob@gmail.com'
- *         password: '134r2134cr1x3c'
- */
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     UserCredentials:
- *       type: object
- *       required:
  *         - accessToken
  *         - refreshToken
  *       properties:
@@ -131,6 +110,27 @@ import authMiddleware from "../common/auth_middleware";
  *       example:
  *         accessToken: '123cd123x1xx1'
  *         refreshToken: '134r2134cr1x3c'
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     UserCredentials:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *       properties:
+ *         email:
+ *           type: string
+ *           description: The user email
+ *         password:
+ *           type: string
+ *           description: The user password
+ *       example:
+ *         email: 'bob@gmail.com'
+ *         password: '134r2134cr1x3c'
  */
 
 /**
