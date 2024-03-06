@@ -1,6 +1,7 @@
 import express from "express";
 const router = express.Router();
 import authController from "../controllers/auth";
+import authMiddleware from "../common/auth_middleware";
 /**
  * @swagger
  * tags:
@@ -186,13 +187,50 @@ router.post("/google", authController.googleSignUp);
  *             $ref: '#/components/schemas/User'
  *     responses:
  *       200:
- *         description: The acess & refresh tokens
+ *         description: The access & refresh tokens along with user data
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Tokens'
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 tokens:
+ *                   $ref: '#/components/schemas/Tokens'
  */
 router.post("/login", authController.login);
+
+/**
+ * @swagger
+ * /auth/{userId}:
+ *   put:
+ *     summary: edit user details
+ *     tags: [User]
+ *     description: need to provide the id of the specific user
+ *     security:
+ *         - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the user to put
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       200:
+ *         description: The new car
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ */
+router.put("/:id", authMiddleware, authController.putById.bind(authController));
 
 /**
  * @swagger
