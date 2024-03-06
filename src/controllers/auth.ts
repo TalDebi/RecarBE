@@ -73,8 +73,9 @@ class AuthController extends BaseController<User> {
         imgUrl: imgUrl,
       });
       const tokens = await this.generateTokens(rs2);
+      const { refreshTokens, password: userPassword, ...SecuredUser } = rs2;
       return res.status(201).send({
-        user: rs2,
+        user: SecuredUser,
         tokens,
       });
     } catch (err) {
@@ -119,7 +120,8 @@ class AuthController extends BaseController<User> {
       }
 
       const tokens = await this.generateTokens(user);
-      return res.status(200).send({ user: user, tokens });
+      const { refreshTokens, password: userPassword, ...SecuredUser } = user;
+      return res.status(200).send({ user: SecuredUser, tokens });
     } catch (err) {
       return res.status(500).send("Internal Server Error");
     }
