@@ -205,7 +205,7 @@ router.post("/login", authController.login);
  * /auth/{userId}:
  *   put:
  *     summary: edit user details
- *     tags: [User]
+ *     tags: [Auth]
  *     description: need to provide the id of the specific user
  *     security:
  *         - bearerAuth: []
