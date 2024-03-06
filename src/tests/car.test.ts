@@ -33,7 +33,7 @@ beforeAll(async () => {
 
   User.deleteMany({ email: user.email });
   const response1 = await request(app).post("/auth/register").send(user);
-  userId = response1.body._id;
+  userId = response1.body.user._id;
   car["owner"] = userId;
   const response = await request(app).post("/auth/login").send(user);
   accessToken = response.body.tokens.accessToken;

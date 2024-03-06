@@ -74,12 +74,8 @@ class AuthController extends BaseController<User> {
       });
       const tokens = await this.generateTokens(rs2);
       return res.status(201).send({
-        name: rs2.name,
-        email: rs2.email,
-        phoneNumber: rs2.phoneNumber,
-        _id: rs2._id,
-        imgUrl: rs2.imgUrl,
-        ...tokens,
+        user: rs2,
+        tokens,
       });
     } catch (err) {
       return res.status(500).send("Internal Server Error");

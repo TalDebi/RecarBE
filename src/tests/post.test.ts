@@ -24,7 +24,7 @@ beforeAll(async () => {
 
   User.deleteMany({ email: user.email });
   const response1 = await request(app).post("/auth/register").send(user);
-  user["_id"] = response1.body._id;
+  user["_id"] = response1.body.user._id;
   car["owner"] = user["_id"];
   post["car"] = car._id;
   await CarModel.create(car);
