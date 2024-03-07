@@ -170,6 +170,7 @@ class PostController extends BaseController<Post> {
     let searchFilters = {};
     let search: SearchQuery = req.query;
     for (let queryKey in search) {
+      console.log(Object.keys(CarModel.schema.paths))
       if (!Object.keys(CarModel.schema.paths).includes(queryKey)) {
         continue;
       }
@@ -209,7 +210,7 @@ class PostController extends BaseController<Post> {
           car: {
             $in: carIds,
           },
-        })
+        }).populate("car")
       );
     } catch (err) {
       console.log(err);
