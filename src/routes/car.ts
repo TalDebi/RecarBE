@@ -102,6 +102,50 @@ import authMiddleware from "../common/auth_middleware";
  */
 router.get("/", authMiddleware, CarController.get.bind(CarController));
 
+
+
+/**
+ * @swagger
+ * /car/colors:
+ *   get:
+ *     summary: get options for car colors
+ *     tags: [Car]
+ *     description: Return all options for colors of cars
+ *     security:
+ *         - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: The colors
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: string
+ */
+router.get('/colors', authMiddleware,CarController.getColors.bind(CarController));
+
+/**
+ * @swagger
+ * /car/cities:
+ *   get:
+ *     summary: get options for car coties
+ *     tags: [Car]
+ *     description: Return all options for cities of cars
+ *     security:
+ *         - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: The cities
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: string
+ */
+router.get('/cities', authMiddleware,CarController.getCities.bind(CarController));
+
 /**
  * @swagger
  * /car/{carId}:
@@ -127,6 +171,7 @@ router.get("/", authMiddleware, CarController.get.bind(CarController));
  *                          $ref: '#/components/schemas/Car'
  */
 router.get("/:id", authMiddleware, CarController.getById.bind(CarController));
+
 
 /**
  * @swagger
