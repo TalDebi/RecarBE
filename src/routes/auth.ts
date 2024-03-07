@@ -70,6 +70,44 @@ import authMiddleware from "../common/auth_middleware";
  * @swagger
  * components:
  *   schemas:
+ *     SecuredUser:
+ *       type: object
+ *       required:
+ *         - name
+ *         - email
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: id
+ *         name:
+ *           type: string
+ *           description: The user name
+ *         email:
+ *           type: string
+ *           description: The user email
+ *         phoneNumber:
+ *           type: string
+ *           description: The user phone number
+ *         imgUrl:
+ *           type: string
+ *           description: The user imgUrl
+ *         likedPosts:
+ *           type: Array
+ *           description: Array of objectIds of liked posts
+ *           items:
+ *             type: string
+ *       example:
+ *         name: 'bob'
+ *         email: 'bob@gmail.com'
+ *         phoneNumber: '054-2355489'
+ *         imgUrl: ''
+ *         likedPosts: ["56cb91bdc3464f14678934ca", "56cb91bdc3464f14678934ca"]
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
  *     ReducedUser:
  *       type: object
  *       required:
@@ -154,7 +192,7 @@ import authMiddleware from "../common/auth_middleware";
  *               type: object
  *               properties:
  *                 user:
- *                   $ref: '#/components/schemas/User'
+ *                   $ref: '#/components/schemas/SecuredUser'
  *                 tokens:
  *                   $ref: '#/components/schemas/Tokens'
  */
@@ -220,7 +258,7 @@ router.post("/google", authController.googleSignUp.bind(authController));
  *               type: object
  *               properties:
  *                 user:
- *                   $ref: '#/components/schemas/User'
+ *                   $ref: '#/components/schemas/SecuredUser'
  *                 tokens:
  *                   $ref: '#/components/schemas/Tokens'
  */
@@ -250,7 +288,7 @@ router.post("/login", authController.login.bind(authController));
  *             $ref: '#/components/schemas/User'
  *     responses:
  *       200:
- *         description: The new car
+ *         description: The new user
  *         content:
  *           application/json:
  *             schema:
