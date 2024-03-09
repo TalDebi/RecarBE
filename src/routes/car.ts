@@ -99,10 +99,22 @@ import authMiddleware from "../common/auth_middleware";
  *                        type: array
  *                        items:
  *                          $ref: '#/components/schemas/Car'
+ *          401:
+ *              description: Unauthorised
+ *              content:
+ *                  text/plain:
+ *                  schema:
+ *                    type: string
+ *                    example: Unauthorized
+ *          500:
+ *              description: Unidentified error
+ *              content:
+ *                  text/plain:
+ *                      schema:
+ *                          type: string
+ *                          example: "Fail: {error message}"
  */
 router.get("/", authMiddleware, CarController.get.bind(CarController));
-
-
 
 /**
  * @swagger
@@ -122,8 +134,26 @@ router.get("/", authMiddleware, CarController.get.bind(CarController));
  *               type: array
  *               items:
  *                 type: string
+ *       401:
+ *         description: Unauthorised
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Unauthorized
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
  */
-router.get('/colors', authMiddleware,CarController.getColors.bind(CarController));
+router.get(
+  "/colors",
+  authMiddleware,
+  CarController.getColors.bind(CarController)
+);
 
 /**
  * @swagger
@@ -143,8 +173,26 @@ router.get('/colors', authMiddleware,CarController.getColors.bind(CarController)
  *               type: array
  *               items:
  *                 type: string
+ *       401:
+ *         description: Unauthorised
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Unauthorized
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
  */
-router.get('/cities', authMiddleware,CarController.getCities.bind(CarController));
+router.get(
+  "/cities",
+  authMiddleware,
+  CarController.getCities.bind(CarController)
+);
 
 /**
  * @swagger
@@ -169,9 +217,30 @@ router.get('/cities', authMiddleware,CarController.getCities.bind(CarController)
  *                  application/json:
  *                      schema:
  *                          $ref: '#/components/schemas/Car'
+ *
+ *          401:
+ *              description: Unauthorised
+ *              content:
+ *                  text/plain:
+ *                     schema:
+ *                         type: string
+ *                         example: Unauthorized
+ *          404:
+ *              description: Car not found
+ *              content:
+ *                  text/plain:
+ *                     schema:
+ *                         type: string
+ *                         example: Resource not found
+ *          500:
+ *              description: Unidentified error
+ *              content:
+ *                  text/plain:
+ *                      schema:
+ *                          type: string
+ *                          example: "Fail: {error message}"
  */
 router.get("/:id", authMiddleware, CarController.getById.bind(CarController));
-
 
 /**
  * @swagger
@@ -194,6 +263,36 @@ router.get("/:id", authMiddleware, CarController.getById.bind(CarController));
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Car'
+ *
+ *       401:
+ *         description: Unauthorised
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Unauthorized
+ *               $ref: '#/components/schemas/Post'
+ *       400:
+ *         description: Invalid body
+ *         content:
+ *            text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Invalid parameters"
+ *       409:
+ *         description: Duplicate object
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Duplicate: {error messgae}"
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
  */
 router.post("/", authMiddleware, CarController.post.bind(CarController));
 
@@ -226,6 +325,35 @@ router.post("/", authMiddleware, CarController.post.bind(CarController));
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Car'
+ *
+ *       401:
+ *         description: Unauthorised
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Unauthorized
+ *       400:
+ *         description: Invalid body
+ *         content:
+ *            text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Invalid parameters"
+ *       404:
+ *         description: Car not found
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "the ID does not exist"
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
  */
 router.put("/:id", authMiddleware, CarController.putById.bind(CarController));
 
@@ -258,6 +386,28 @@ router.put("/:id", authMiddleware, CarController.putById.bind(CarController));
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Car'
+ *
+ *       401:
+ *         description: Unauthorised
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Unauthorized
+ *       404:
+ *         description: Car not found
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "the ID does not exist"
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
  */
 router.delete(
   "/:id",

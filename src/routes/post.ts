@@ -1,7 +1,11 @@
 import express from "express";
 const router = express.Router();
 import authMiddleware from "../common/auth_middleware";
-import { commentMiddleware, securedCommentMiddleware, securedReplyMiddleware } from "../common/comment_middleware";
+import {
+  commentMiddleware,
+  securedCommentMiddleware,
+  securedReplyMiddleware,
+} from "../common/comment_middleware";
 import postController from "../controllers/post";
 
 /**
@@ -128,7 +132,7 @@ import postController from "../controllers/post";
  *           type: Array
  *           description: Array of replies
  *           items:
- *             type: 
+ *             type:
  *               _id:
  *                 type: string
  *                 description: objectId of the comment
@@ -139,18 +143,17 @@ import postController from "../controllers/post";
  *                 $ref: '#/components/schemas/ReducedUser'
  *       example:
  *          text: "Nice car!"
- *          publisher: 
+ *          publisher:
  *            name: 'Fred'
  *            email: 'Fred@gmail.com'
  *            imgUrl: ''
- *          replies: 
+ *          replies:
  *            - text: "Thanks!"
- *              publisher: 
+ *              publisher:
  *                name: 'bob'
  *                email: 'bob@gmail.com'
  *                imgUrl: ''
  */
-
 
 /**
  * @swagger
@@ -176,7 +179,7 @@ import postController from "../controllers/post";
  *           items:
  *             $ref: '#/components/schemas/Comment'
  *       example:
- *         car: 
+ *         car:
  *           make: 'toyota'
  *           model: 'camry'
  *           year: 1993
@@ -192,13 +195,13 @@ import postController from "../controllers/post";
  *           imgUrl: ''
  *         comments:
  *           - text: "Nice car!"
- *             publisher: 
+ *             publisher:
  *               name: 'Fred'
  *               email: 'Fred@gmail.com'
  *               imgUrl: ''
- *             replies: 
+ *             replies:
  *               - text: "Thanks!"
- *                 publisher: 
+ *                 publisher:
  *                   name: 'bob'
  *                   email: 'bob@gmail.com'
  *                   imgUrl: ''
@@ -286,6 +289,20 @@ import postController from "../controllers/post";
  *                          type: array
  *                          items:
  *                              $ref: '#/components/schemas/Post'
+ *          401:
+ *              description: Unauthorised
+ *              content:
+ *                  text/plain:
+ *                      schema:
+ *                          type: string
+ *                          example: Unauthorized
+ *          500:
+ *              description: Unidentified error
+ *              content:
+ *                  text/plain:
+ *                      schema:
+ *                          type: string
+ *                          example: "Fail: {error message}"
  */
 router.get("/", authMiddleware, postController.search.bind(postController));
 
@@ -312,6 +329,20 @@ router.get("/", authMiddleware, postController.search.bind(postController));
  *                  application/json:
  *                      schema:
  *                          $ref: '#/components/schemas/Post'
+ *          401:
+ *              description: Unauthorised
+ *              content:
+ *                  text/plain:
+ *                      schema:
+ *                          type: string
+ *                          example: Unauthorized
+ *          500:
+ *              description: Unidentified error
+ *              content:
+ *                  text/plain:
+ *                      schema:
+ *                          type: string
+ *                          example: "Fail: {error message}"
  */
 router.get("/:id", authMiddleware, postController.getById.bind(postController));
 /**
@@ -337,12 +368,26 @@ router.get("/:id", authMiddleware, postController.getById.bind(postController));
  *                  application/json:
  *                      schema:
  *                          $ref: '#/components/schemas/PopulatedPost'
+ *          401:
+ *              description: Unauthorised
+ *              content:
+ *                  text/plain:
+ *                      schema:
+ *                          type: string
+ *                          example: Unauthorized
+ *          500:
+ *              description: Unidentified error
+ *              content:
+ *                  text/plain:
+ *                      schema:
+ *                          type: string
+ *                          example: "Fail: {error message}"
  */
-router.get("/:id/populated", authMiddleware, postController.getPopulatedPost.bind(postController));
-
-
-
-
+router.get(
+  "/:id/populated",
+  authMiddleware,
+  postController.getPopulatedPost.bind(postController)
+);
 
 /**
  * @swagger
@@ -365,9 +410,29 @@ router.get("/:id/populated", authMiddleware, postController.getPopulatedPost.bin
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Post'
+ *       400:
+ *         description: Invalid body
+ *         content:
+ *            text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Invalid parameters"
+ *       409:
+ *         description: Duplicate object
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Duplicate: {error messgae}"
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
  */
 router.post("/", authMiddleware, postController.post.bind(postController));
-
 
 /**
  * @swagger
@@ -397,8 +462,33 @@ router.post("/", authMiddleware, postController.post.bind(postController));
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Comment'
+ *       404:
+ *         description: Post not found
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "The post does not exist"
+ *       401:
+ *         description: Unauthorised
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Unauthorized
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
  */
-router.post("/:postId/comment", authMiddleware, postController.addComment.bind(postController));
+router.post(
+  "/:postId/comment",
+  authMiddleware,
+  postController.addComment.bind(postController)
+);
 
 /**
  * @swagger
@@ -420,7 +510,7 @@ router.post("/:postId/comment", authMiddleware, postController.addComment.bind(p
  *          schema:
  *            type: string
  *          required: true
- *          description: ID of the post 
+ *          description: ID of the post
  *        - in: path
  *          name: commentId
  *          schema:
@@ -434,8 +524,33 @@ router.post("/:postId/comment", authMiddleware, postController.addComment.bind(p
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Comment'
+ *       400:
+ *         description: Comment and post missmatch
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Comment does not belong to post
+ *       401:
+ *         description: Unauthorised
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Unauthorized
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
  */
-router.post("/:postId/comment/:commentId/reply", [authMiddleware, commentMiddleware], postController.addReply.bind(postController));
+router.post(
+  "/:postId/comment/:commentId/reply",
+  [authMiddleware, commentMiddleware],
+  postController.addReply.bind(postController)
+);
 
 /**
  * @swagger
@@ -458,7 +573,7 @@ router.post("/:postId/comment/:commentId/reply", [authMiddleware, commentMiddlew
  *            type: string
  *          required: true
  *          description: ID of the comment to be edited
- *  
+ *
  *     requestBody:
  *       required: true
  *       content:
@@ -472,8 +587,36 @@ router.post("/:postId/comment/:commentId/reply", [authMiddleware, commentMiddlew
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Comment'
+ *       400:
+ *         description: Comment and post missmatch
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Comment does not belong to post
+ *       401:
+ *         description: User is not the comment publisher or token invalid
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               oneOf:
+ *                 - type: string
+ *                   example: Unauthorized
+ *                 - type: string
+ *                   example: Comment does not belong to user
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
  */
-router.put("/:postId/comment/:commentId", [authMiddleware, securedCommentMiddleware], postController.editComment.bind(postController))
+router.put(
+  "/:postId/comment/:commentId",
+  [authMiddleware, securedCommentMiddleware],
+  postController.editComment.bind(postController)
+);
 
 /**
  * @swagger
@@ -496,13 +639,13 @@ router.put("/:postId/comment/:commentId", [authMiddleware, securedCommentMiddlew
  *            type: string
  *          required: true
  *          description: ID of the comment the reply belongs to
-  *        - in: path
+ *        - in: path
  *          name: replyId
  *          schema:
  *            type: string
  *          required: true
  *          description: ID of the reply to edit
- *   
+ *
  *     requestBody:
  *       required: true
  *       content:
@@ -516,9 +659,40 @@ router.put("/:postId/comment/:commentId", [authMiddleware, securedCommentMiddlew
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Reply'
+ *       400:
+ *         description: "Comment/Reply and post missmatch"
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               oneOf:
+ *                 - type: string
+ *                   example: Comment does not belong to post
+ *                 - type: string
+ *                   example: Reply does not belong to comment
+ *       401:
+ *         description: User is not the reply publisher or token invalid
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               oneOf:
+ *                 - type: string
+ *                   example: Unauthorized
+ *                 - type: string
+ *                   example: Reply does not belong to user
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
  */
 
-router.put("/:postId/comment/:commentId/reply/:replyId", [authMiddleware, securedReplyMiddleware], postController.editReply.bind(postController))
+router.put(
+  "/:postId/comment/:commentId/reply/:replyId",
+  [authMiddleware, securedReplyMiddleware],
+  postController.editReply.bind(postController)
+);
 
 /**
  * @swagger
@@ -548,6 +722,27 @@ router.put("/:postId/comment/:commentId/reply/:replyId", [authMiddleware, secure
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Post'
+ *       400:
+ *         description: Invalid body
+ *         content:
+ *            text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Invalid parameters"
+ *       404:
+ *         description: Post not found
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "the ID does not exist"
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
  */
 router.put("/:id", authMiddleware, postController.putById.bind(postController));
 
@@ -574,11 +769,32 @@ router.put("/:id", authMiddleware, postController.putById.bind(postController));
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Post'
+ *       401:
+ *         description: Unauthorised
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Unauthorized
+ *       404:
+ *         description: Post not found
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "the ID does not exist"
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
  */
 router.delete(
-    "/:id",
-    authMiddleware,
-    postController.deleteById.bind(postController)
+  "/:id",
+  authMiddleware,
+  postController.deleteById.bind(postController)
 );
 
 /**
@@ -610,9 +826,36 @@ router.delete(
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Comment'
+ *       400:
+ *         description: Comment and post missmatch
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Comment does not belong to post
+ *       401:
+ *         description: User is not the comment publisher or token invalid
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               oneOf:
+ *                 - type: string
+ *                   example: Unauthorized
+ *                 - type: string
+ *                   example: Comment does not belong to user
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
  */
-router.delete("/:postId/comment/:commentId", [authMiddleware, securedCommentMiddleware], postController.deleteComment.bind(postController))
-
+router.delete(
+  "/:postId/comment/:commentId",
+  [authMiddleware, securedCommentMiddleware],
+  postController.deleteComment.bind(postController)
+);
 
 /**
  * @swagger
@@ -649,6 +892,37 @@ router.delete("/:postId/comment/:commentId", [authMiddleware, securedCommentMidd
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Comment'
+ *       400:
+ *         description: "Comment/Reply and post missmatch"
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               oneOf:
+ *                 - type: string
+ *                   example: Comment does not belong to post
+ *                 - type: string
+ *                   example: Reply does not belong to comment
+ *       401:
+ *         description: User is not the reply publisher or token invalid
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               oneOf:
+ *                 - type: string
+ *                   example: Unauthorized
+ *                 - type: string
+ *                   example: Reply does not belong to user
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
  */
-router.delete("/:postId/comment/:commentId/reply/:replyId", [authMiddleware, securedReplyMiddleware], postController.deleteReply.bind(postController))
+router.delete(
+  "/:postId/comment/:commentId/reply/:replyId",
+  [authMiddleware, securedReplyMiddleware],
+  postController.deleteReply.bind(postController)
+);
 export default router;

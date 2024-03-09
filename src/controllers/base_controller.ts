@@ -22,7 +22,6 @@ export class BaseController<ModelType> {
           ? schemaPath.instance.toLowerCase() === "array"
             ? "object"
             : schemaPath.instance.toLowerCase()
-
           : "string";
 
       if (
@@ -47,7 +46,7 @@ export class BaseController<ModelType> {
         return res.status(200).send(results);
       }
     } catch (err) {
-      return res.status(500).json({ message: err.message });
+      return res.status(500).send("Fail: " + err.message);
     }
   }
 
@@ -56,11 +55,11 @@ export class BaseController<ModelType> {
     try {
       const result = await this.model.findById(req.params.id);
       if (!result) {
-        return res.status(404).json({ message: "Resource not found" });
+        return res.status(404).send("Resource not found");
       }
       return res.status(200).send(result);
     } catch (err) {
-      return res.status(500).json({ message: err.message });
+      return res.status(500).send("Fail: " + err.message);
     }
   }
 
@@ -76,10 +75,10 @@ export class BaseController<ModelType> {
       return res.status(201).send(obj);
     } catch (err) {
       if (err.message.includes("E11000")) {
-        return res.status(409).send("fail: " + err.message);
+        return res.status(409).send("Duplicate: " + err.message);
       }
       console.log(err);
-      return res.status(500).send("fail: " + err.message);
+      return res.status(500).send("Fail: " + err.message);
     }
   }
 
@@ -92,7 +91,7 @@ export class BaseController<ModelType> {
 
     const oldObject = await this.model.findById(req.params.id);
 
-    if (!oldObject) return res.status(404).send("the ID is not exist...");
+    if (!oldObject) return res.status(404).send("the ID does not exist");
 
     try {
       const newObject = await this.model.findByIdAndUpdate(
@@ -105,7 +104,7 @@ export class BaseController<ModelType> {
       return res.status(200).send(newObject);
     } catch (err) {
       console.log(err);
-      return res.status(500).send("fail: " + err.message);
+      return res.status(500).send("Fail: " + err.message);
     }
   }
 
@@ -114,7 +113,7 @@ export class BaseController<ModelType> {
 
     const oldObject = await this.model.findById(req.params.id);
 
-    if (!oldObject) return res.status(404).send("the ID is not exist...");
+    if (!oldObject) return res.status(404).send("the ID is not exist");
 
     try {
       await oldObject.deleteOne();
@@ -122,7 +121,7 @@ export class BaseController<ModelType> {
       return res.status(200).send(oldObject);
     } catch (err) {
       console.log(err);
-      return res.status(500).send("fail: " + err.message);
+      return res.status(500).send("Fail: " + err.message);
     }
   }
 }

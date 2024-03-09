@@ -146,7 +146,7 @@ import authMiddleware from "../common/auth_middleware";
  *           schema:
  *             $ref: '#/components/schemas/User'
  *     responses:
- *       200:
+ *       201:
  *         description: The access & refresh tokens along with user data
  *         content:
  *           application/json:
@@ -157,6 +157,27 @@ import authMiddleware from "../common/auth_middleware";
  *                   $ref: '#/components/schemas/User'
  *                 tokens:
  *                   $ref: '#/components/schemas/Tokens'
+ *       400:
+ *         description: Missing detailes
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "missing email or password"
+ *       409:
+ *         description: Duplicate user
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "email already exists"
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Internal Server Error"
  */
 router.post("/register", authController.register.bind(authController));
 
@@ -180,7 +201,7 @@ router.post("/register", authController.register.bind(authController));
  *             required:
  *               - credential
  *     responses:
- *       '200':
+ *       '201':
  *         description: Successful sign-in
  *         content:
  *           application/json:
@@ -196,6 +217,20 @@ router.post("/register", authController.register.bind(authController));
  *                 message:
  *                   type: string
  *                   description: Error message
+ *       '401':
+ *         description: Expired ID
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "ID token expired"
+ *       '500':
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "{error message}"
  */
 router.post("/google", authController.googleSignUp.bind(authController));
 
@@ -223,6 +258,20 @@ router.post("/google", authController.googleSignUp.bind(authController));
  *                   $ref: '#/components/schemas/User'
  *                 tokens:
  *                   $ref: '#/components/schemas/Tokens'
+ *       401:
+ *         description: Wrong credentials
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "email or password incorrect"
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Internal Server Error"
  */
 router.post("/login", authController.login.bind(authController));
 
@@ -255,6 +304,34 @@ router.post("/login", authController.login.bind(authController));
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorised
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Unauthorized
+ *       400:
+ *         description: Invalid body
+ *         content:
+ *            text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Invalid parameters"
+ *       404:
+ *         description: User not found
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "the ID does not exist"
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
  */
 router.put("/:id", authMiddleware, authController.putById.bind(authController));
 
@@ -270,6 +347,20 @@ router.put("/:id", authMiddleware, authController.putById.bind(authController));
  *     responses:
  *       200:
  *         description: logout completed successfully
+ *       401:
+ *         description: Unauthorised
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Unauthorized
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "{error message}"
  */
 router.get("/logout", authController.logout.bind(authController));
 
@@ -284,11 +375,25 @@ router.get("/logout", authController.logout.bind(authController));
  *          - bearerAuth: []
  *      responses:
  *          200:
- *              description: The acess & refresh tokens
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Tokens'
+ *            description: The acess & refresh tokens
+ *            content:
+ *              application/json:
+ *                schema:
+ *                  $ref: '#/components/schemas/Tokens'
+ *       401:
+ *         description: Unauthorised
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Unauthorized
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "{error message}"
  */
 router.get("/refresh", authController.refresh.bind(authController));
 

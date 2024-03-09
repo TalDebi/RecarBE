@@ -53,7 +53,7 @@ class PostController extends BaseController<Post> {
       }
     } catch (err) {
       console.log(err);
-      return res.status(500).json({ message: err.message });
+      return res.status(500).json("Fail: " + err.message);
     }
   }
 
@@ -63,7 +63,7 @@ class PostController extends BaseController<Post> {
 
     const oldObject: Post = await this.model.findById(req.params.postId);
     const newComment = await CommentModel.create(req.body);
-    if (!oldObject) return res.status(404).send("The post does not exist...");
+    if (!oldObject) return res.status(404).send("The post does not exist");
 
     try {
       const newObject = await this.model.findByIdAndUpdate(
@@ -74,7 +74,7 @@ class PostController extends BaseController<Post> {
       return res.status(201).send(newObject);
     } catch (err) {
       console.log(err);
-      return res.status(500).send("fail: " + err.message);
+      return res.status(500).send("Fail: " + err.message);
     }
   }
 
@@ -102,7 +102,7 @@ class PostController extends BaseController<Post> {
       return res.send(newObject);
     } catch (err) {
       console.log(err);
-      return res.status(500).send("fail: " + err.message);
+      return res.status(500).send("Fail: " + err.message);
     }
   }
 
@@ -116,7 +116,7 @@ class PostController extends BaseController<Post> {
       return res.status(200).send(req.comment);
     } catch (err) {
       console.log(err);
-      return res.status(500).send("fail: " + err.message);
+      return res.status(500).send("Fail: " + err.message);
     }
   }
 
@@ -130,7 +130,7 @@ class PostController extends BaseController<Post> {
       return res.status(200).send(req.reply);
     } catch (err) {
       console.log(err);
-      return res.status(500).send("fail: " + err.message);
+      return res.status(500).send("Fail: " + err.message);
     }
   }
 
