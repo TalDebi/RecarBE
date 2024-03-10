@@ -175,7 +175,7 @@ import authMiddleware from "../common/auth_middleware";
  * @swagger
  * /auth/register:
  *   post:
- *     summary: registers a new user
+ *     summary: Registers a new user
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -184,8 +184,8 @@ import authMiddleware from "../common/auth_middleware";
  *           schema:
  *             $ref: '#/components/schemas/User'
  *     responses:
- *       200:
- *         description: The access & refresh tokens along with user data
+ *       201:
+ *         description: Registration successful. Returns the access & refresh tokens along with user data.
  *         content:
  *           application/json:
  *             schema:
@@ -195,6 +195,12 @@ import authMiddleware from "../common/auth_middleware";
  *                   $ref: '#/components/schemas/SecuredUser'
  *                 tokens:
  *                   $ref: '#/components/schemas/Tokens'
+ *       400:
+ *         description: Bad request. Missing email or password in request body.
+ *       409:
+ *         description: Conflict. Email already exists in the database.
+ *       500:
+ *         description: Internal Server Error. Failed to register the user.
  */
 router.post("/register", authController.register.bind(authController));
 
@@ -241,7 +247,7 @@ router.post("/google", authController.googleSignUp.bind(authController));
  * @swagger
  * /auth/login:
  *   post:
- *     summary: login a user
+ *     summary: Login a user
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -251,7 +257,7 @@ router.post("/google", authController.googleSignUp.bind(authController));
  *             $ref: '#/components/schemas/UserCredentials'
  *     responses:
  *       200:
- *         description: The access & refresh tokens along with user data
+ *         description: Login successful. Returns the access & refresh tokens along with user data.
  *         content:
  *           application/json:
  *             schema:
@@ -261,6 +267,12 @@ router.post("/google", authController.googleSignUp.bind(authController));
  *                   $ref: '#/components/schemas/SecuredUser'
  *                 tokens:
  *                   $ref: '#/components/schemas/Tokens'
+ *       400:
+ *         description: Bad request. Missing email or password in request body.
+ *       401:
+ *         description: Unauthorized. Incorrect email or password.
+ *       500:
+ *         description: Internal Server Error.
  */
 router.post("/login", authController.login.bind(authController));
 
@@ -270,16 +282,16 @@ router.post("/login", authController.login.bind(authController));
  *   put:
  *     summary: edit user details
  *     tags: [Auth]
- *     description: need to provide the id of the specific user
+ *     description: Update user details by ID
  *     security:
- *         - bearerAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
  *         schema:
  *           type: string
  *         required: true
- *         description: ID of the user to put
+ *         description: ID of the user to update
  *     requestBody:
  *       required: true
  *       content:
@@ -288,11 +300,19 @@ router.post("/login", authController.login.bind(authController));
  *             $ref: '#/components/schemas/User'
  *     responses:
  *       200:
- *         description: The new user
+ *         description: Updated user details
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               $ref: '#/components/schemas/SecuredUser'
+ *       400:
+ *         description: Missing email or password
+ *       404:
+ *         description: User not found
+ *       409:
+ *         description: Email already exists
+ *       500:
+ *         description: Error updating user
  */
 router.put("/:id", authMiddleware, authController.putById.bind(authController));
 
@@ -300,33 +320,43 @@ router.put("/:id", authMiddleware, authController.putById.bind(authController));
  * @swagger
  * /auth/logout:
  *   get:
- *     summary: logout a user
+ *     summary: Logout a user
  *     tags: [Auth]
- *     description: need to provide the refresh token in the auth header
+ *     description: Logout a user by providing the refresh token in the authorization header.
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: logout completed successfully
+ *         description: Logout completed successfully
+ *       401:
+ *         description: Unauthorized - Refresh token not provided or invalid
+ *       500:
+ *         description: Internal Server Error
  */
 router.get("/logout", authController.logout.bind(authController));
 
 /**
  * @swagger
  * /auth/refresh:
- *  get:
- *      summary: get a new access token using the refresh token
- *      tags: [Auth]
- *      description: need to provide the refresh token in the auth header
- *      security:
- *          - bearerAuth: []
- *      responses:
- *          200:
- *              description: The acess & refresh tokens
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Tokens'
+ *   get:
+ *     summary: Get a new access token using the refresh token
+ *     tags: [Auth]
+ *     description: Need to provide the refresh token in the Authorization header
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successful token refresh. Returns the new access & refresh tokens.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Tokens'
+ *       400:
+ *         description: Bad request. Missing refresh token in the request header.
+ *       401:
+ *         description: Unauthorized. Invalid or missing refresh token.
+ *       500:
+ *         description: Internal Server Error. Failed to refresh tokens.
  */
 router.get("/refresh", authController.refresh.bind(authController));
 
