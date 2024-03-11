@@ -7,8 +7,6 @@ import { AuthResquest } from "../common/auth_middleware";
 class UserController {
   async getLikedPosts(req: AuthResquest, res: Response) {
     try {
-      console.log(1);
-      console.log(req.params.userId);
       const user = await UserModel.findById(req.params.userId);
 
       if (!user) {

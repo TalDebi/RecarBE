@@ -7,6 +7,7 @@ import CarRoute from "./routes/car";
 import PostRouter from "./routes/post";
 import authRoute from "./routes/auth";
 import fileRoute from "./routes/file_route";
+import UserRoute from "./routes/user";
 
 const initApp = (): Promise<Express> => {
   const promise = new Promise<Express>((resolve) => {
@@ -28,6 +29,7 @@ const initApp = (): Promise<Express> => {
       app.use("/auth", authRoute);
       app.use("/file", fileRoute);
       app.use("/post", PostRouter);
+      app.use("/user", UserRoute);
       app.use("/public", express.static("public"));
       resolve(app);
     });

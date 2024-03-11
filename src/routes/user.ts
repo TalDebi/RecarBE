@@ -163,7 +163,7 @@ import authMiddleware from "../common/auth_middleware";
  *         description: Internal server error
  */
 router.get(
-  "/user/likedPosts/:userId",
+  "/likedPosts/:userId",
   authMiddleware,
   userController.getLikedPosts.bind(userController)
 );
