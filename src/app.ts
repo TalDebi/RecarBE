@@ -6,7 +6,7 @@ import bodyParser from "body-parser";
 import CarRoute from "./routes/car";
 import PostRouter from "./routes/post";
 import authRoute from "./routes/auth";
-import fileRoute from "./routes/file_route";
+import fileRoute from "./routes/file";
 import UserRoute from "./routes/user";
 
 const initApp = (): Promise<Express> => {
