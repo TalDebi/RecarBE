@@ -20,7 +20,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post("/", upload.single("file"), (req, res) => {
-  console.log("router.post(/file: " + base + req.file.path);
   return res.status(200).send({ url: base + req.file.path });
 });
 export = router;

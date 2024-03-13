@@ -114,8 +114,8 @@ router.post("/register", authController.register.bind(authController));
  *             required:
  *               - credential
  *     responses:
- *       '200':
- *         description: Successful sign-in
+ *       '201':
+ *         description: User created or signed in successfully
  *         content:
  *           application/json:
  *             schema:
@@ -130,8 +130,28 @@ router.post("/register", authController.register.bind(authController));
  *                 message:
  *                   type: string
  *                   description: Error message
+ *       '401':
+ *         description: ID token expired
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message
  */
-router.post("/google", authController.googleSignUp.bind(authController));
+router.post("/google", authController.googleSignIn.bind(authController));
 
 /**
  * @swagger
