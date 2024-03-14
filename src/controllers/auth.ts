@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 import { Document } from "mongoose";
 import { randomBytes } from "crypto";
+import mongoose from "mongoose";
 
 const client = new OAuth2Client();
 
@@ -224,16 +225,26 @@ class AuthController {
 
   async putById(req: Request, res: Response) {
     const { id } = req.params;
-
     const { name, email, password, phoneNumber, imgUrl } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).send("Missing email or password");
+    if (!id || !name || !email || !password) {
+      return res.status(400).send("Missing required fields");
+    }
+
+    // Check if the provided ID is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send("Invalid user ID");
     }
 
     try {
-      const existingUser = await UserModel.findOne({ email: email });
-      if (existingUser && existingUser._id.toString() !== id) {
+      const existingUser = await UserModel.findById(id);
+
+      if (!existingUser) {
+        return res.status(404).send("User not found");
+      }
+
+      const userWithSameEmail = await UserModel.findOne({ email: email });
+      if (userWithSameEmail && userWithSameEmail._id.toString() !== id) {
         return res.status(409).send("Email already exists");
       }
 
