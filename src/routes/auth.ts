@@ -23,116 +23,6 @@ import authMiddleware from "../common/auth_middleware";
  * @swagger
  * components:
  *   schemas:
- *     User:
- *       type: object
- *       required:
- *         - name
- *         - email
- *         - password
- *       properties:
- *         _id:
- *           type: string
- *           description: id
- *         name:
- *           type: string
- *           description: The user name
- *         email:
- *           type: string
- *           description: The user email
- *         password:
- *           type: string
- *           description: The user password
- *         phoneNumber:
- *           type: string
- *           description: The user phone number
- *         imgUrl:
- *           type: string
- *           description: The user imgUrl
- *         refreshTokens:
- *           type: string[]
- *           description: The user refresh tokens
- *         likedPosts:
- *           type: Array
- *           description: Array of objectIds of liked posts
- *           items:
- *             type: string
- *       example:
- *         name: 'bob'
- *         email: 'bob@gmail.com'
- *         password: '123456'
- *         phoneNumber: '054-2355489'
- *         imgUrl: ''
- *         refreshTokens: ["56cb91bdc3464f14678934ca", "56cb91bdc3464f14678934ca"]
- *         likedPosts: ["56cb91bdc3464f14678934ca", "56cb91bdc3464f14678934ca"]
- */
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     SecuredUser:
- *       type: object
- *       required:
- *         - name
- *         - email
- *       properties:
- *         _id:
- *           type: string
- *           description: id
- *         name:
- *           type: string
- *           description: The user name
- *         email:
- *           type: string
- *           description: The user email
- *         phoneNumber:
- *           type: string
- *           description: The user phone number
- *         imgUrl:
- *           type: string
- *           description: The user imgUrl
- *         likedPosts:
- *           type: Array
- *           description: Array of objectIds of liked posts
- *           items:
- *             type: string
- *       example:
- *         name: 'bob'
- *         email: 'bob@gmail.com'
- *         phoneNumber: '054-2355489'
- *         imgUrl: ''
- *         likedPosts: ["56cb91bdc3464f14678934ca", "56cb91bdc3464f14678934ca"]
- */
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     ReducedUser:
- *       type: object
- *       required:
- *         - name
- *         - email
- *       properties:
- *         name:
- *           type: string
- *           description: The user name
- *         email:
- *           type: string
- *           description: The user email
- *         imgUrl:
- *           type: string
- *           description: The user imgUrl
- *       example:
- *         name: 'bob'
- *         email: 'bob@gmail.com'
- *         imgUrl: ''
- */
-
-/**
- * @swagger
- * components:
- *   schemas:
  *     Tokens:
  *       type: object
  *       required:
@@ -224,8 +114,8 @@ router.post("/register", authController.register.bind(authController));
  *             required:
  *               - credential
  *     responses:
- *       '200':
- *         description: Successful sign-in
+ *       '201':
+ *         description: User created or signed in successfully
  *         content:
  *           application/json:
  *             schema:
@@ -240,8 +130,28 @@ router.post("/register", authController.register.bind(authController));
  *                 message:
  *                   type: string
  *                   description: Error message
+ *       '401':
+ *         description: ID token expired
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message
  */
-router.post("/google", authController.googleSignUp.bind(authController));
+router.post("/google", authController.googleSignIn.bind(authController));
 
 /**
  * @swagger

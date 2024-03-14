@@ -4,13 +4,18 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 import { Document } from "mongoose";
+import { randomBytes } from "crypto";
 
 const client = new OAuth2Client();
 
 class AuthController {
-  async googleSignUp(req: Request, res: Response) {
-    console.log(req.body);
+  async googleSignIn(req: Request, res: Response) {
     try {
+      if (!req.body.credential) {
+        return res
+          .status(400)
+          .json({ message: "Missing credential field in request body" });
+      }
       const ticket = await client.verifyIdToken({
         idToken: req.body.credential,
         audience: process.env.GOOGLE_CLIENT_ID,
@@ -21,18 +26,22 @@ class AuthController {
         let user = await UserModel.findOne({ email: email });
         if (user == null) {
           user = await UserModel.create({
-            name: "",
+            name: payload?.name,
             email: email,
-            password: "",
+            password: randomBytes(10).toString("hex"),
+            phoneNumber: "",
             imgUrl: payload?.picture,
           });
         }
         const tokens = await this.generateTokens(user);
+        const {
+          refreshTokens,
+          password: userPassword,
+          ...securedUser
+        } = user.toObject();
         return res.status(201).send({
-          email: user.email,
-          _id: user._id,
-          imgUrl: user.imgUrl,
-          ...tokens,
+          user: securedUser,
+          tokens,
         });
       }
     } catch (err) {
@@ -142,7 +151,6 @@ class AuthController {
       process.env.JWT_REFRESH_SECRET,
       async (err, user: { _id: string }) => {
         if (err) {
-          console.log(err);
           return res.sendStatus(401);
         }
         try {
@@ -177,7 +185,6 @@ class AuthController {
       process.env.JWT_REFRESH_SECRET,
       async (err, user: { _id: string }) => {
         if (err) {
-          console.log(err);
           return res.sendStatus(401);
         }
         try {

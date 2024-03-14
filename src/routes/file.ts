@@ -2,7 +2,6 @@ import express from "express";
 const router = express.Router();
 import multer from "multer";
 
-// const base = "http://" + process.env.DOMAIN_BASE + ":" + process.env.PORT + "/";
 const base = "http://localhost:3000/";
 
 const storage = multer.diskStorage({
@@ -21,7 +20,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post("/", upload.single("file"), (req, res) => {
-  console.log("router.post(/file: " + base + req.file.path);
   return res.status(200).send({ url: base + req.file.path });
 });
 export = router;
