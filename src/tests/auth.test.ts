@@ -121,14 +121,13 @@ describe("Auth tests", () => {
       .get("/auth/refresh")
       .set("Authorization", "JWT " + refreshToken)
       .send();
-    expect(response.statusCode).not.toBe(200);
+    expect(response.statusCode).toBe(401);
 
-    //verify that the new token is not valid as well
     const response1 = await request(app)
       .get("/auth/refresh")
       .set("Authorization", "JWT " + newRefreshToken)
       .send();
-    expect(response1.statusCode).not.toBe(200);
+    expect(response1.statusCode).toBe(401);
   });
 
   test("Test for Invalid Refresh Token", async () => {
@@ -137,6 +136,11 @@ describe("Auth tests", () => {
       .set("Authorization", "JWT invalidRefreshToken")
       .send();
     expect(response.statusCode).toBe(401);
+  });
+
+  test("Test for missing Refresh Token", async () => {
+    const response = await request(app).get("/auth/refresh").send();
+    expect(response.statusCode).toBe(400);
   });
 
   test("Test for Expired Refresh Token", async () => {
