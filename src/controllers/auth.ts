@@ -231,7 +231,6 @@ class AuthController {
       return res.status(400).send("Missing required fields");
     }
 
-    // Check if the provided ID is a valid ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).send("Invalid user ID");
     }

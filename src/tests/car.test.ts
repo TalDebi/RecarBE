@@ -32,10 +32,9 @@ beforeAll(async () => {
   await CarModel.deleteMany();
 
   User.deleteMany({ email: user.email });
-  const response1 = await request(app).post("/auth/register").send(user);
-  userId = response1.body.user._id;
+  const response = await request(app).post("/auth/register").send(user);
+  userId = response.body.user._id;
   car["owner"] = userId;
-  const response = await request(app).post("/auth/login").send(user);
   accessToken = response.body.tokens.accessToken;
 });
 
