@@ -4,15 +4,19 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 import { Document } from "mongoose";
-import { AuthResquest } from "../common/auth_middleware";
-import { BaseController } from "./base_controller";
+import { randomBytes } from "crypto";
+import mongoose from "mongoose";
 
 const client = new OAuth2Client();
 
-class AuthController extends BaseController<User> {
-  async googleSignUp(req: Request, res: Response) {
-    console.log(req.body);
+class AuthController {
+  async googleSignIn(req: Request, res: Response) {
     try {
+      if (!req.body.credential) {
+        return res
+          .status(400)
+          .json({ message: "Missing credential field in request body" });
+      }
       const ticket = await client.verifyIdToken({
         idToken: req.body.credential,
         audience: process.env.GOOGLE_CLIENT_ID,
@@ -23,18 +27,22 @@ class AuthController extends BaseController<User> {
         let user = await UserModel.findOne({ email: email });
         if (user == null) {
           user = await UserModel.create({
-            name: "",
+            name: payload?.name,
             email: email,
-            password: "",
+            password: randomBytes(10).toString("hex"),
+            phoneNumber: "",
             imgUrl: payload?.picture,
           });
         }
         const tokens = await this.generateTokens(user);
+        const {
+          refreshTokens,
+          password: userPassword,
+          ...securedUser
+        } = user.toObject();
         return res.status(201).send({
-          email: user.email,
-          _id: user._id,
-          imgUrl: user.imgUrl,
-          ...tokens,
+          user: securedUser,
+          tokens,
         });
       }
     } catch (err) {
@@ -73,9 +81,13 @@ class AuthController extends BaseController<User> {
         imgUrl: imgUrl,
       });
       const tokens = await this.generateTokens(rs2);
-      const { refreshTokens, password: userPassword, ...SecuredUser } = rs2;
+      const {
+        refreshTokens,
+        password: userPassword,
+        ...securedUser
+      } = rs2.toObject();
       return res.status(201).send({
-        user: SecuredUser,
+        user: securedUser,
         tokens,
       });
     } catch (err) {
@@ -120,7 +132,12 @@ class AuthController extends BaseController<User> {
       }
 
       const tokens = await this.generateTokens(user);
-      const { refreshTokens, password: userPassword, ...SecuredUser } = user;
+
+      const {
+        refreshTokens,
+        password: userPassword,
+        ...SecuredUser
+      } = user.toObject();
       return res.status(200).send({ user: SecuredUser, tokens });
     } catch (err) {
       return res.status(500).send("Internal Server Error");
@@ -135,8 +152,9 @@ class AuthController extends BaseController<User> {
       refreshToken,
       process.env.JWT_REFRESH_SECRET,
       async (err, user: { _id: string }) => {
-        console.log(err);
-        if (err) return res.sendStatus(401);
+        if (err) {
+          return res.sendStatus(401);
+        }
         try {
           const userDb = await UserModel.findOne({ _id: user._id });
           if (
@@ -163,13 +181,12 @@ class AuthController extends BaseController<User> {
   async refresh(req: Request, res: Response) {
     const authHeader = req.headers["authorization"];
     const refreshToken = authHeader && authHeader.split(" ")[1]; // Bearer <token>
-    if (refreshToken == null) return res.sendStatus(401);
+    if (refreshToken == null) return res.sendStatus(400);
     jwt.verify(
       refreshToken,
       process.env.JWT_REFRESH_SECRET,
       async (err, user: { _id: string }) => {
         if (err) {
-          console.log(err);
           return res.sendStatus(401);
         }
         try {
@@ -206,8 +223,64 @@ class AuthController extends BaseController<User> {
       }
     );
   }
+
+  async putById(req: Request, res: Response) {
+    const { id } = req.params;
+    const { name, email, password, phoneNumber, imgUrl } = req.body;
+
+    if (!id || !name || !email || !password) {
+      return res.status(400).send("Missing required fields");
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send("Invalid user ID");
+    }
+
+    try {
+      const existingUser = await UserModel.findById(id);
+
+      if (!existingUser) {
+        return res.status(404).send("User not found");
+      }
+
+      const userWithSameEmail = await UserModel.findOne({ email: email });
+      if (userWithSameEmail && userWithSameEmail._id.toString() !== id) {
+        return res.status(409).send("Email already exists");
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const encryptedPassword = await bcrypt.hash(password, salt);
+
+      const updatedUser = await UserModel.findByIdAndUpdate(
+        id,
+        {
+          name: name,
+          email: email,
+          password: encryptedPassword,
+          phoneNumber: phoneNumber,
+          imgUrl: imgUrl,
+        },
+        { new: true }
+      );
+
+      if (!updatedUser) {
+        return res.status(404).send("User not found");
+      }
+
+      const {
+        refreshTokens,
+        password: userPassword,
+        ...securedUser
+      } = updatedUser.toObject();
+
+      return res.status(200).send(securedUser);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).send("Internal Server Error");
+    }
+  }
 }
 
-const authController = new AuthController(UserModel);
+const authController = new AuthController();
 
 export default authController;
