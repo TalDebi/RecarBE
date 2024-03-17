@@ -8,10 +8,6 @@ export interface Comment {
 }
 
 const commentSchema = new Schema<Comment>({
-  _id: {
-    type: mongoose.Schema.Types.ObjectId,
-    default: new mongoose.Types.ObjectId(),
-  },
   publisher: {
     type: Schema.Types.ObjectId,
     required: true,

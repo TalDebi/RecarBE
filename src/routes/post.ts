@@ -389,6 +389,56 @@ router.get(
   postController.getPopulatedPost.bind(postController)
 );
 
+
+
+
+
+/**
+ * @swagger
+ * /post/user/{userId}:
+ *  get:
+ *      summary: get all post published by a user
+ *      tags: [Post]
+ *      security:
+ *          - bearerAuth: []
+ *      parameters:
+ *        - in: path
+ *          name: userId
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: ID of the user
+ *      responses:
+ *          200:
+ *              description: posts
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: array
+ *                          items: string
+ *          401:
+ *              description: Unauthorised
+ *              content:
+ *                  text/plain:
+ *                      schema:
+ *                          type: string
+ *                          example: Unauthorized
+ *          500:
+ *              description: Unidentified error
+ *              content:
+ *                  text/plain:
+ *                      schema:
+ *                          type: string
+ *                          example: "Fail: {error message}"
+ */
+router.get(
+  "/user/:userId",
+  authMiddleware,
+  postController.getPostsByUser.bind(postController)
+);
+
+
+
 /**
  * @swagger
  * /post:
