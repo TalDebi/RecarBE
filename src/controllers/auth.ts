@@ -132,6 +132,7 @@ class AuthController {
       }
 
       const tokens = await this.generateTokens(user);
+
       const {
         refreshTokens,
         password: userPassword,
