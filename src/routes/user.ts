@@ -132,7 +132,7 @@ import authMiddleware from "../common/auth_middleware";
 
 /**
  * @swagger
- * /user/likedPosts/{userId}:
+ * /user/{userId}/likedPosts:
  *   get:
  *     summary: Get liked posts by user ID
  *     tags: [User]
@@ -163,9 +163,86 @@ import authMiddleware from "../common/auth_middleware";
  *         description: Internal server error
  */
 router.get(
-  "/likedPosts/:userId",
+  "/:userId/likedPosts",
   authMiddleware,
   userController.getLikedPosts.bind(userController)
 );
 
+/**
+ * @swagger
+ * /user/{userId}/likedPosts:
+ *   post:
+ *     summary: add liked post
+ *     tags: [User]
+ *     security:
+ *         - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             _id:string
+ *     responses:
+ *       200:
+ *         description: The Post was added to user liked posts
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
+ */
+router.post(
+  "/:userId/likedPosts",
+  authMiddleware,
+  userController.addLikedPost.bind(userController)
+);
+
+
+/**
+ * @swagger
+ * /user/{userId}/likedPosts/{postId}:
+ *   delete:
+ *     summary: remove liked post
+ *     tags: [User]
+ *     security:
+ *         - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ * 
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Post Id
+ *     responses:
+ *       200:
+ *         description: The Post was removed to user liked posts
+ *       500:
+ *         description: Unidentified error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Fail: {error message}"
+ */
+router.delete(
+  "/:userId/likedPosts/:postId",
+  authMiddleware,
+  userController.removeLikedPost.bind(userController)
+);
 export default router;

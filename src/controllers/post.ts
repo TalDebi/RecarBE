@@ -187,7 +187,6 @@ class PostController extends BaseController<Post> {
           searchFilters[queryKey][key]
             ? {}
             : delete searchFilters[queryKey][key]
-
         );
       } else if (Array.isArray(search[queryKey])) {
         searchFilters[queryKey] = {
@@ -214,6 +213,15 @@ class PostController extends BaseController<Post> {
     } catch (err) {
       console.log(err);
       return res.status(500).send(err);
+    }
+  }
+
+  async getPostsByUser(req: AuthResquest, res: Response) {
+    try {
+      const results = await this.model.find({ publisher: req.user._id });
+      return res.status(200).send(results.map((post) => post._id));
+    } catch (err) {
+      return res.status(500).send("Fail: " + err.message);
     }
   }
 }
