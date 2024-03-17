@@ -209,7 +209,7 @@ class PostController extends BaseController<Post> {
           car: {
             $in: carIds,
           },
-        })
+        }).populate("car")
       );
     } catch (err) {
       console.log(err);
