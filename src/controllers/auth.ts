@@ -214,8 +214,8 @@ class AuthController {
           userDb.refreshTokens.push(newRefreshToken);
           await userDb.save();
           return res.status(200).send({
-            accessToken: accessToken,
-            refreshToken: refreshToken,
+            accessToken,
+            refreshToken: newRefreshToken,
           });
         } catch (err) {
           return res.sendStatus(500).send(err.message);
