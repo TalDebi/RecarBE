@@ -82,6 +82,22 @@ describe("Car tests", () => {
     expect(postedCar.owner).toBe(car.owner);
   });
 
+  test("Test Get colors", async () => {
+    const response = await request(app)
+      .get("/car/colors")
+      .set("Authorization", "JWT " + accessToken);
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+  });
+  test("Test Get cities", async () => {
+    const response = await request(app)
+      .get("/car/cities")
+      .set("Authorization", "JWT " + accessToken);
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+  });
+
+
   test("Test Post duplicate Car", async () => {
     const response = await request(app)
       .post("/car")
@@ -106,4 +122,7 @@ describe("Car tests", () => {
       .set("Authorization", "JWT " + accessToken);
     expect(response.statusCode).toBe(200);
   });
+
+
+  
 });

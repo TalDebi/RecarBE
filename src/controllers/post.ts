@@ -25,7 +25,9 @@ class PostController extends BaseController<Post> {
   async getPopulatedPost(req: AuthResquest, res: Response) {
     console.log("get populated post");
     try {
-      if (req.params.id) {
+      if (!req.params.id) {
+        return res.status(400).send("parameter of id is required")
+      }
         const results = await this.model
           .findById(req.params.id)
           .populate("publisher", ["name", "_id", "email", "imgUrl"])
@@ -47,10 +49,6 @@ class PostController extends BaseController<Post> {
             ],
           });
         return res.send(results);
-      } else {
-        const results = await this.model.find();
-        return res.send(results);
-      }
     } catch (err) {
       console.log(err);
       return res.status(500).json("Fail: " + err.message);

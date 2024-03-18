@@ -125,7 +125,7 @@ describe("Post get tests", () => {
     const recievedPost = response.body[0];
     expect(recievedPost._id).toBe(post._id);
     expect(recievedPost.publisher).toBe(user["_id"]);
-    expect(recievedPost.car).toBe(String(post.car));
+    expect(recievedPost.car._id).toBe(String(post.car));
   });
 
   test("Test Get existing post by search", async () => {
@@ -143,7 +143,29 @@ describe("Post get tests", () => {
     expect(recievedPost._id).toBe(post._id);
     expect(recievedPost.comments.length).toBe(1);
     expect(recievedPost.publisher).toBe(user["_id"]);
-    expect(recievedPost.car).toBe(String(post.car));
+    expect(recievedPost.car._id).toBe(String(post.car));
+  });
+
+  test("Test Get existing post by user", async () => {
+    const response = await request(app)
+      .get("/post/user/" +  user["_id"])
+      .set("Authorization", "JWT " + accessToken);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.length).toBe(1);
+    const recievedPost = response.body[0];
+    expect(recievedPost).toBe(post._id);
+  });
+  
+  test("Test Get existing post by pupulated route", async () => {
+    const response = await request(app)
+      .get("/post/" + post._id + "/populated")
+      .set("Authorization", "JWT " + accessToken);
+    expect(response.statusCode).toBe(200);
+    const recievedPost = response.body;
+    expect(recievedPost._id).toBe(post._id);
+    expect(recievedPost.comments.length).toBe(1);
+    expect(recievedPost.publisher._id).toBe(user["_id"]);
+    expect(recievedPost.car._id).toBe(String(post.car));
   });
   test("Test Get non-existing post by search", async () => {
     const response = await request(app)

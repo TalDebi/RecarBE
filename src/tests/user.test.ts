@@ -14,6 +14,8 @@ const user = {
   password: "1234567890",
 };
 
+const postId = new ObjectId()
+
 let accessToken;
 
 beforeAll(async () => {
@@ -31,13 +33,29 @@ afterAll(async () => {
 });
 
 describe("User tests", () => {
+
+  test("should add liked post for a valid user ID with authentication", async () => {
+    const response = await request(app)
+      .post(`/user/${user._id}/likedPosts`)
+      .set("Authorization", `Bearer ${accessToken}`).send({_id:postId});
+    expect(response.statusCode).toBe(200);
+  });
+
+
   test("should return liked posts for a valid user ID with authentication", async () => {
     const response = await request(app)
-      .get(`/user/likedPosts/${user._id}`)
+      .get(`/user/${user._id}/likedPosts`)
       .set("Authorization", `Bearer ${accessToken}`);
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("likedPosts");
     expect(response.body.likedPosts).toBeInstanceOf(Array);
+  });
+
+  test("should delete liked post for a valid user ID with authentication", async () => {
+    const response = await request(app)
+      .delete(`/user/${user._id}/likedPosts/${postId}`)
+      .set("Authorization", `Bearer ${accessToken}`);
+    expect(response.statusCode).toBe(200);
   });
 
   test("should return 404 for non-existing user ID with authentication", async () => {
@@ -49,9 +67,12 @@ describe("User tests", () => {
   });
 
   test("should return 401 for unauthorized access without token", async () => {
-    const response = await request(app).get(`/user/likedPosts/${user._id}`);
+    const response = await request(app).get(`/user/${user._id}/likedPosts`);
     expect(response.statusCode).toBe(401);
   });
+  
+
+  
 
   test("should return 401 for unauthorized access with invalid token", async () => {
     const response = await request(app)

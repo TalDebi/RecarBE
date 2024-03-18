@@ -12,10 +12,6 @@ export interface Post {
 }
 
 const postSchema = new Schema<Post>({
-  _id: {
-    type: mongoose.Schema.Types.ObjectId,
-    default: new mongoose.Types.ObjectId(),
-  },
   car: {
     type: Schema.Types.ObjectId,
     required: true,
