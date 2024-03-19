@@ -12,6 +12,7 @@
     "testUser": "tsc && jest --detectOpenHandles --forceExit --runInBand ./src/tests/user.test.ts",
     "start": "tsc && node ./dist/src/server.js",
     "dev": "nodemon ./src/server.ts",
+    "build": "tsc -p tsconfig_prod.json",
     "prod": "copy .envprod .env && tsc -p tsconfig_prod.json && pm2 restart ecosystem.config.js --env production",
     "prod1": "copy .envprod .env && tsc -p tsconfig_prod.json &&  node ./dist/src/server.js"
   },
