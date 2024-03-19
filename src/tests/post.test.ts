@@ -12,9 +12,9 @@ let objects_to_delete = [];
 let app: Express;
 let accessToken: string;
 let user = {
-  email: "testStudent@test.com",
+  email: "testStudent5@test.com",
   password: "1234567890",
-  name: "Testy",
+  name: "Testys",
 };
 
 beforeAll(async () => {
