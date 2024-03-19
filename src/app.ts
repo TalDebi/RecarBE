@@ -8,6 +8,7 @@ import PostRouter from "./routes/post";
 import authRoute from "./routes/auth";
 import fileRoute from "./routes/file";
 import UserRoute from "./routes/user";
+import cors from "cors";
 
 const initApp = (): Promise<Express> => {
   const promise = new Promise<Express>((resolve) => {
@@ -17,6 +18,11 @@ const initApp = (): Promise<Express> => {
     const url = process.env.DB_URL;
     mongoose.connect(url).then(() => {
       const app = express();
+      app.use(
+        cors({
+          maxAge: 3600,
+        })
+      );
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: true }));
       app.use((req, res, next) => {
